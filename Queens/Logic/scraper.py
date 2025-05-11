@@ -63,7 +63,6 @@ def scrape_queens_board_metadata():
     load_cookies(driver, COOKIE_FILE)
 
     driver.get("https://www.linkedin.com/games/queens") 
-    time.sleep(5)
 
     board = driver.find_element(By.ID, "queens-grid")
 
@@ -76,6 +75,8 @@ def scrape_queens_board_metadata():
     board_matrix = [[None for _ in range(size)] for _ in range(size)]
     colour_region_matrix = [[None for _ in range(size)] for _ in range(size)]
 
+    """
+    # OLD CODE. DELETED DUE TO 5s SLOWER AS IT WAS MULTIPLE QUERIES IN A LOOP.
     cells = board.find_elements(By.CLASS_NAME, "queens-cell-with-border")
 
     for cell in cells:
@@ -90,6 +91,34 @@ def scrape_queens_board_metadata():
             continue
 
         row = int(aria_match.group(1)) - 1  # 1-indexed to 0-indexed
+        col = int(aria_match.group(2)) - 1
+
+        colour_region_matrix[row][col] = color_index
+    """
+
+    # Used LLM to help Create similar query but in JavaScript for speed
+    script = """
+        return Array.from(document.querySelectorAll(".queens-cell-with-border")).map(cell => {
+            return {
+                classAttr: cell.className,
+                aria: cell.getAttribute("aria-label")
+            };
+        });
+    """
+    cell_data = driver.execute_script(script)
+
+    for entry in cell_data:
+        class_attr = entry["classAttr"]
+        aria = entry["aria"]
+
+        color_match = re.search(r"cell-color-(\d+)", class_attr)
+        color_index = int(color_match.group(1)) if color_match else None
+
+        aria_match = re.search(r"row (\d+), column (\d+)", aria)
+        if not aria_match:
+            continue
+
+        row = int(aria_match.group(1)) - 1
         col = int(aria_match.group(2)) - 1
 
         colour_region_matrix[row][col] = color_index
