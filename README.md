@@ -26,5 +26,6 @@ Additionally, I will scrape the current day's puzzle and solve it, before then s
   - Input what method you would like to solve: Backtracking, Linear Programming, Reinforcement Learning
   - Individual Files ran in order are:
     - `Queens\Logic\scraper.py`
+      - Currently scrapes using selenium, but I'll experiment with computer vision too
     - Solver choice used (all can be found in `Queens\Logic\Solvers`)
     - `Queens\Logic\inputter.py`
