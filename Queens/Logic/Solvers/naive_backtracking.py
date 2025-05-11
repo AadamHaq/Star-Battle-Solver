@@ -1,6 +1,8 @@
 """
 Inspiration for the code: 
-- N-Queens Solution (famous backtracking problem)
+- N-Queens Solution (famous backtracking problem) Leetcode 51
+    - Used https://www.youtube.com/watch?v=Ph95IHmRp5M solution from Neetcode
+    - https://www.geeksforgeeks.org/python-program-for-n-queen-problem-backtracking-3/
 - https://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2019-2020/Makalah/stima2020k2-035.pdf
 """
 
@@ -32,6 +34,8 @@ def is_valid(
         - If there are any Queens in it's 3x3 area
     
     N.B: We don't check row as rows are done sequentially and when a Queen is placed, we move to the next row
+
+    Returns: Boolean -> True if can place a queen
     """
 
     # Column Check
@@ -74,11 +78,8 @@ def backtracking(
         used_colours: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
     
     Description: Solves the board using backtracking (recursive algorithm)
-        - If a column already has a Queen
-        - If a coloured colour already has a Queen
-        - If there are any Queens in it's 3x3 area
     
-    N.B: We don't check row as rows are done sequentially and when a Queen is placed, we move to the next row
+    Returns: rows and columns of queen solutions
     """
 
     # Initialise Sets in first pass

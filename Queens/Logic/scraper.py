@@ -11,6 +11,15 @@ import os
 COOKIE_FILE = "linkedin_cookies.pkl" # Use get_cookies to retrieve pickle file the first time
 
 def load_cookies(driver, cookie_file):
+    """
+    Function: load_cookies retrieves cookies saved in the pickle file
+
+    Args:
+        driver: webdriver used (in this case Chrome driver)
+        cookie_file: OS path to cookie pickle file
+    
+    Description: Retrieves cookies and loads them in the driver
+    """
     if not os.path.exists(cookie_file):
         raise FileNotFoundError(f"Cookie file '{cookie_file}' not found. Please login manually and save cookies first by running get_cookies.py")
     
@@ -23,6 +32,16 @@ def load_cookies(driver, cookie_file):
 
 
 def scrape_queens_board_metadata():
+    """
+    Function: scrape_queens_board_metadata is the scaper for the board
+
+    Args:
+        None
+    
+    Description: Scrapes the metadata of the queens board for use
+
+    Returns: dict: {'board_size': int, 'colour_regions': List[List[int]]}
+    """
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
@@ -55,7 +74,7 @@ def scrape_queens_board_metadata():
 
     size = rows
     board_matrix = [[None for _ in range(size)] for _ in range(size)]
-    color_region_matrix = [[None for _ in range(size)] for _ in range(size)]
+    colour_region_matrix = [[None for _ in range(size)] for _ in range(size)]
 
     cells = board.find_elements(By.CLASS_NAME, "queens-cell-with-border")
 
@@ -73,16 +92,15 @@ def scrape_queens_board_metadata():
         row = int(aria_match.group(1)) - 1  # 1-indexed to 0-indexed
         col = int(aria_match.group(2)) - 1
 
-        color_region_matrix[row][col] = color_index
+        colour_region_matrix[row][col] = color_index
 
     driver.quit()
 
     return {
         "board_size": size,
-        "color_regions": color_region_matrix
+        "colour_regions": colour_region_matrix
     }
 
 if __name__ == "__main__":
     data = scrape_queens_board_metadata()
-    for row in data["color_regions"]:
-        print(row)
+    print(data)
