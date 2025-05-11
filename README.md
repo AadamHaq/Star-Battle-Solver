@@ -17,4 +17,14 @@ To solve LinkedIn Queens, I want to use several techniques:
 - Reinforcement Learning Approach
   - Will train daily and then test using saved weights
 
-Additionally, I am to scrape the current day's puzzle and solve it, before then seeing if it can be inputted to beat some of my friend's times!
+Additionally, I will scrape the current day's puzzle and solve it, before then seeing if it can be inputted to beat some of my friend's times (anonymised to spare any embarrassment!)
+
+### How to run
+
+- For first time use run `Queens\Logic\get_cookies.py` to got the cookies
+- Run `Queens\queens_solver.ipynb` to create a solution
+  - Input what method you would like to solve: Backtracking, Linear Programming, Reinforcement Learning
+  - Individual Files ran in order are:
+    - `Queens\Logic\scraper.py`
+    - Solver choice used (all can be found in `Queens\Logic\Solvers`)
+    - `Queens\Logic\inputter.py`
