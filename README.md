@@ -11,9 +11,10 @@ Star Battle is a generalisation of the LinkedIn Queens game. An example can be f
 ## LinkedIn Queens Solver
 
 To solve LinkedIn Queens, I want to use several techniques:
+- Backtracking (Naive solution as a baseline)
 - Linear Programming
   - This will constitute breaking the game into its pure logic and creating linear equations
-- Neural Network Approach
 - Reinforcement Learning Approach
+  - Will train daily and then test using saved weights
 
 Additionally, I am to scrape the current day's puzzle and solve it, before then seeing if it can be inputted to beat some of my friend's times!
