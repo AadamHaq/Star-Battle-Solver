@@ -29,3 +29,22 @@ Additionally, I will scrape the current day's puzzle and solve it, before then s
       - Currently scrapes using selenium, but I'll experiment with computer vision too
     - Solver choice used (all can be found in `Queens\Logic\Solvers`)
     - `Queens\Logic\inputter.py`
+
+### Learnings
+
+This project was shorter than initially intended! The backtracking algorithm performed much better than initially thought, so left little reason to complete the other methods in practice; however these will be done anyway for fun.
+
+Key learnings:
+
+- Using a scraper and inputter with selenium
+- Improve backtracking algorithm skills
+- Problem Solving to find ways to reduce time complexity
+
+Next Steps:
+
+- Complete Linear Programming Solution
+- Create Computer Vision Scraper (never used before)
+- Create RL solution after training data obtained
+- Add a way to share my time onto a group chat with my friends
+- Scrape their times daily and add them to a csv rather than doing this manually
+- Plotter to create a graph of everyone's times per day

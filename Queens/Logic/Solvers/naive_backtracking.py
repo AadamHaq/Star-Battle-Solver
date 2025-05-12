@@ -60,7 +60,8 @@ def is_valid(
 
 
 def backtracking(
-    board: List[List[int]],
+    board: List[List[int]], # Use colour_regions for full board from scraper
+    N: int = 0,
     row: int = 0,
     queens: Set[Tuple[int, int]] = None,
     used_cols: Set[int] = None,
@@ -72,6 +73,7 @@ def backtracking(
 
     Args:
         board: List of Lists of Integers between [0, N-1]
+        N: int for length of board. Default is 0
         row: int between [0, N-1]. Starts with default 0
         queens: A set of tuples. Starts with default None (Initialises in first pass)
         used_cols: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
@@ -79,7 +81,7 @@ def backtracking(
     
     Description: Solves the board using backtracking (recursive algorithm)
     
-    Returns: rows and columns of queen solutions
+    Returns: List[Tuple(int, int)]] -> rows and columns of queen solutions
     """
 
     # Initialise Sets in first pass
@@ -101,7 +103,7 @@ def backtracking(
             used_colours.add(board[row][col])
 
             # Continue through to the next row with a queen in that position
-            result = backtracking(board, row + 1, queens, used_cols, used_colours)
+            result = backtracking(board, N, row + 1, queens, used_cols, used_colours)
             if result:
                 return result  # Found a solution further down (non empty result)
 
@@ -113,24 +115,4 @@ def backtracking(
             # Next pass will therefore return to original row that was looked but at the next column spot
 
     return []  # No solution found
-
-
-if __name__ == "__main__":
-    test_board = [
-        [0, 1, 1, 2, 3, 3, 3, 4],
-        [0, 0, 1, 2, 2, 3, 3, 4],
-        [5, 0, 0, 0, 0, 3, 3, 4],
-        [5, 5, 0, 0, 0, 0, 3, 4],
-        [6, 6, 0, 0, 0, 0, 3, 0],
-        [7, 6, 0, 0, 0, 0, 0, 0],
-        [7, 7, 7, 0, 0, 0, 0, 0],
-        [7, 7, 7, 7, 7, 0, 0, 0]
-    ]
-
-    N = len(test_board)
-
-    solution = backtracking(test_board)
-    print("Solution:")
-    for r, c in sorted(solution):
-        print(f"Row {r}, Column {c}")
 

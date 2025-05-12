@@ -31,16 +31,14 @@ def load_cookies(driver, cookie_file):
         driver.add_cookie(cookie)
 
 
-def scrape_queens_board_metadata():
+def initialise_driver(cookie_file):
     """
-    Function: scrape_queens_board_metadata is the scaper for the board
+    Function: initialises the driver to be used
 
     Args:
-        None
+        cookie_file: OS path to cookie pickle file
     
-    Description: Scrapes the metadata of the queens board for use
-
-    Returns: dict: {'board_size': int, 'colour_regions': List[List[int]]}
+    Description: Initialises the driver, launches LinkedIn and loads the cookies
     """
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
@@ -61,6 +59,22 @@ def scrape_queens_board_metadata():
     time.sleep(3)
 
     load_cookies(driver, COOKIE_FILE)
+    print("Cookies loaded")
+
+    return driver
+
+
+def scraper(driver):
+    """
+    Function: scraper will scrape the metadata for the board
+
+    Args:
+        driver: Driver that was initialised
+    
+    Description: Scrapes the metadata of the queens board for use
+
+    Returns: dict: {'board_size': int, 'board': List[List[int]]}
+    """
 
     driver.get("https://www.linkedin.com/games/queens") 
 
@@ -123,13 +137,10 @@ def scrape_queens_board_metadata():
 
         colour_region_matrix[row][col] = color_index
 
-    driver.quit()
+    # We now quit in the inputter
+    # driver.quit()
 
     return {
         "board_size": size,
-        "colour_regions": colour_region_matrix
+        "board": colour_region_matrix
     }
-
-if __name__ == "__main__":
-    data = scrape_queens_board_metadata()
-    print(data)
