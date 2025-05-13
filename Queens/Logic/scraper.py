@@ -58,7 +58,7 @@ def initialise_driver(cookie_file):
     driver.get("https://www.linkedin.com") # Open normal linkedin first to confirm/set cookies
     time.sleep(3)
 
-    load_cookies(driver, COOKIE_FILE)
+    load_cookies(driver, cookie_file)
     print("Cookies loaded")
 
     return driver

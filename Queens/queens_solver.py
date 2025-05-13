@@ -1,9 +1,10 @@
 from Logic.scraper import initialise_driver, scraper
 from Logic.Solvers.naive_backtracking import backtracking
 from Logic.inputter import input_solution
+from Score_Scraping.share_score import share_score
 import time
 
-def main(cookie_file):
+def main(cookie_file, name):
     """
     Function: main runs all other functions for the game
 
@@ -30,8 +31,11 @@ def main(cookie_file):
 
     time.sleep(10)
 
+    share_score(driver, name)
+
     driver.quit()
 
 if __name__ == "__main__":
     COOKIE_FILE = "linkedin_cookies.pkl"
-    main(COOKIE_FILE)
+    name = "Aadam Ul Haq"
+    main(COOKIE_FILE, name)
