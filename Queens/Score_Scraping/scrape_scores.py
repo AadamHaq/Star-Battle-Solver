@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -11,6 +10,7 @@ import time
 import pickle
 import os
 from selenium.webdriver.common.keys import Keys
+
 
 
 def load_cookies(driver, cookie_file):
@@ -67,44 +67,74 @@ def initialise_driver(cookie_file):
 
     return driver
 
-def scrape_queens_messages_today(driver):
-    today_label = datetime.now().strftime("%b %d")  # e.g., "May 13"
+
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+import re, time
+
+def scroll_chat_to_top(driver, pause=1.0, max_scrolls=15):
+    xpath = (
+        "//div[contains(@class,'msg-s-message-list') "
+        "and contains(@class,'msg-s-message-list--scroll-buffer') "
+        "and contains(@class,'scrollable')]"
+    )
+    chat = driver.find_element(By.XPATH, xpath)
+    last_h = driver.execute_script("return arguments[0].scrollHeight", chat)
+    for _ in range(max_scrolls):
+        driver.execute_script("arguments[0].scrollTop = 0", chat)
+        time.sleep(pause)
+        new_h = driver.execute_script("return arguments[0].scrollHeight", chat)
+        if new_h == last_h:
+            break
+        last_h = new_h
+
+def scrape_queens_via_bs(driver):
+    scroll_chat_to_top(driver, pause=1.2, max_scrolls=20)
+
+    # Grab the container’s HTML
+    xpath = (
+        "//div[contains(@class,'msg-s-message-list') "
+        "and contains(@class,'msg-s-message-list--scroll-buffer') "
+        "and contains(@class,'scrollable')]"
+    )
+    container = driver.find_element(By.XPATH, xpath)
+    html = container.get_attribute("innerHTML")
+
+    # Parse with BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    lis = soup.select("li.msg-s-message-list__event")
+
+     # Find the index of the real Today divider
+    start = 0
+    for i, li in enumerate(lis):
+        t = li.find("time", class_="msg-s-message-list__time-heading")
+        if t and t.get_text(strip=True) == "Today":
+            start = i
+            break
+
+    # Walk from that <li> onward **including** the marker li itself
     results = []
-    is_today = False
+    current_sender = "Unknown"
+    for li in lis[start:]:            # <-- include the marker li
+        # A) update sender if meta section present
+        meta = li.select_one(".msg-s-message-group__meta")
+        if meta:
+            name_span = meta.select_one(".msg-s-message-group__name")
+            if name_span and name_span.get_text(strip=True):
+                current_sender = name_span.get_text(strip=True)
 
-    elements = driver.find_elements(By.XPATH, "//*")
-
-    for el in elements:
-        # Detect today's date header
-        if el.tag_name == "time" and "msg-s-message-list__time-heading" in el.get_attribute("class"):
-            is_today = el.text.strip() == today_label
+        # B) find bubble text (even in the marker li)
+        bubble = li.select_one(".msg-s-event-listitem__body")
+        if not bubble:
             continue
+        text = bubble.get_text("\n", strip=True)
 
-        if not is_today:
-            continue
-
-        if "msg-s-event-listitem" in el.get_attribute("class"):
-            try:
-                # Extract message text
-                msg_el = el.find_element(By.CLASS_NAME, "msg-s-event-listitem__body")
-                message = msg_el.text.strip()
-
-                # Match pattern like "Queens #123"
-                if re.match(r"^Queens\s+#\d{3}", message):
-                    name_el = el.find_element(By.CLASS_NAME, "msg-s-message-group__name")
-                    sender = name_el.text.strip()
-
-                    results.append({
-                        "sender": sender,
-                        "message": message
-                    })
-            except Exception:
-                continue
+        # C) match first non-empty line
+        first = next((line for line in text.splitlines() if line.strip()), "")
+        if re.match(r"^Queens #\d{3}", first):
+            results.append((current_sender, text))
 
     return results
-
-
-
 
 
 def score_scraper(driver, name):
@@ -124,8 +154,8 @@ def score_scraper(driver, name):
         conversation = driver.find_element(By.XPATH, f"//span[text()='{name}']/ancestor::div[contains(@class, 'msg-conversation-card__content--selectable')]")
         conversation.click()
 
-        time.sleep(5)
-        results = scrape_queens_messages_today(driver)
+        time.sleep(4)
+        results = scrape_queens_via_bs(driver)
         return results
     except:
         print(f"Could not find button for {name}")
@@ -133,7 +163,7 @@ def score_scraper(driver, name):
 
 def main():
     COOKIE_FILE = "linkedin_cookies.pkl"
-    name = "Anonymised Name"
+    name = "Anonymised"
     driver = initialise_driver(COOKIE_FILE)
     results = score_scraper(driver, name)
     print(results)

@@ -3,8 +3,8 @@ import time
 
 def share_score(driver, name):
 
-    button = driver.find_element(By.ID, "ember121") # Clicks send button
-    button.click()
+    share_button = driver.find_element(By.XPATH, "//button[.//svg/use[contains(@href, '#send-privately-medium')]]") # id changes each time
+    share_button.click() # share button
 
     time.sleep(1)
 
