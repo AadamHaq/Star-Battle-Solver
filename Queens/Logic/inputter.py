@@ -10,7 +10,7 @@ def input_solution(driver, solution):
     Function: input_solution places the queens in the grid
 
     Args:
-        driver: Driver that was initialised
+        driver: Selenium driver that was initialised
         solution: List[Tuple(int, int)] rows and columns of the queens in the solution. SOLUTION MUST BE 1-INDEXED DUE TO LINKEDIN
     
     Description: Completes the board!

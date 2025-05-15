@@ -1,7 +1,7 @@
 from Logic.scraper import initialise_driver, scraper
 from Logic.Solvers.naive_backtracking import backtracking
 from Logic.inputter import input_solution
-from Score_Scraping.share_score import share_score
+from Logic.share_score import share_score
 import time
 
 def main(cookie_file, name):
@@ -10,6 +10,7 @@ def main(cookie_file, name):
 
     Args:
         cookie_file: .pkl file that can be retrieved by running get_cookies.py
+        name: Name of group chat that the score will be sent to
     
     Description: Runs all other functions into one seamless solution then quits the driver
 
@@ -29,7 +30,7 @@ def main(cookie_file, name):
     solution_1_indexed = [(r + 1, c + 1) for r, c in sorted(solution)] # Sorted purely for visual purposes
     input_solution(driver, solution_1_indexed)
 
-    time.sleep(10)
+    time.sleep(5)
 
     share_score(driver, name)
 
@@ -37,5 +38,5 @@ def main(cookie_file, name):
 
 if __name__ == "__main__":
     COOKIE_FILE = "linkedin_cookies.pkl"
-    name = "Aadam Ul Haq"
+    name = "ENTER NAME"
     main(COOKIE_FILE, name)

@@ -15,7 +15,7 @@ def load_cookies(driver, cookie_file):
     Function: load_cookies retrieves cookies saved in the pickle file
 
     Args:
-        driver: webdriver used (in this case Chrome driver)
+        driver: Selenium driver that was initialised
         cookie_file: OS path to cookie pickle file
     
     Description: Retrieves cookies and loads them in the driver
@@ -69,7 +69,7 @@ def scraper(driver):
     Function: scraper will scrape the metadata for the board
 
     Args:
-        driver: Driver that was initialised
+        driver: Selenium driver that was initialised
     
     Description: Scrapes the metadata of the queens board for use
 
