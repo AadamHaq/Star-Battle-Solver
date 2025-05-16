@@ -6,13 +6,13 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def scroll_chat(driver, key_presses=150, pause=0.03):
+def scroll_chat(driver, key_presses=250, pause=0.03):
     """
     Function: Scrolls up the LinkedIn group chat to load more messages
 
     Args:
         driver: Selenium driver that was initialised
-        key_presses: Number of times Up Key is pressed. Default is 150
+        key_presses: Number of times Up Key is pressed. Default is 250
         pause: Seconds between each key press
 
     Description: Scrolls up using up keys after pressing within the chat container
@@ -28,15 +28,24 @@ def scroll_chat(driver, key_presses=150, pause=0.03):
             target = bubbles[-1] # Latest message
             driver.execute_script("arguments[0].scrollIntoView(true);", target)
             time.sleep(0.3)
-            ActionChains(driver).move_to_element_with_offset(target, 100, 10).click().perform() # Click latest message to the right in case there is a hyperlink
+
+            offset_x, offset_y = 100, 10
+            ActionChains(driver).move_to_element_with_offset(target, offset_x, offset_y).click().perform()
             time.sleep(0.3)
-            for _ in range(key_presses):
-                target.send_keys(Keys.ARROW_UP) # Up arrow
+
+            for i in range(key_presses):
+                target.send_keys(Keys.ARROW_UP)
                 time.sleep(pause)
-            print(f"Scrolled chat by sending {key_presses} UP arrow keys.")
+
+                # After 50 presses, click again at the same offset
+                if i == 49:
+                    ActionChains(driver).move_to_element_with_offset(target, offset_x, offset_y).click().perform()
+                    time.sleep(0.3)
+
+            print(f"Scrolled chat by sending {key_presses} UP arrow keys with intermediate click.")
             return True
         except (StaleElementReferenceException, NoSuchElementException):
-            print(f"Attempt {attempt+1}: Encountered stale element, retrying...") # Raise error
+            print(f"Attempt {attempt+1}: Encountered stale element, retrying...")
             time.sleep(1)
     print("Failed to scroll chat by keys after retries.")
     return False

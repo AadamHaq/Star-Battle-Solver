@@ -6,6 +6,7 @@ from Logic.upload_plot import upload_plot
 def main(cookie_file, name):
     driver = initialise_driver(cookie_file)
     results = score_scraper(driver, name)
+    print(results)
     write_csv(results)
     plot_graph()
     upload_plot(driver)

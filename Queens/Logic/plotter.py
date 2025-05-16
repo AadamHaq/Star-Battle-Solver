@@ -11,33 +11,37 @@ load_dotenv(dotenv_path=project_root / ".env")
 
 
 def name_to_env_key(name):
-    return "ALIAS_" + name.upper().replace(" ", "_")
+    cleaned = name.replace('.', '').strip()
+    return "ALIAS_" + cleaned.replace(" ", "_").upper()
 
 def get_dow(day):
     dow_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    return dow_names[(day % 7)]  # Monday is day % 7 == 6 → index 6 = "Sat"
+    return dow_names[(day % 7) + 2]  # Monday is day % 7 == 6 → index 6 = "Sat"
 
 # Build alias dict directly from os.environ
 alias_dict = {
     key: value for key, value in os.environ.items() if key.startswith("ALIAS_")
-}
+    }
+
 
 def prepare_csv(results):
-
-    # Extract day
     day_match = re.search(r'Queens\s+#(\d+)', results[0][1])
     day = int(day_match.group(1)) if day_match else None
 
     dow = get_dow(day)
 
-    # Build row
     row = {"Day": day, "DoW": dow}
     for name, text in results:
-        alias = alias_dict.get(name_to_env_key(name))
+        alias_key = name_to_env_key(name)
+        alias = alias_dict.get(alias_key)
+
+        print(f"Processing name '{name}' → alias key '{alias_key}' → alias value '{alias}'")
+
         if alias:
             score_match = re.search(r'\|\s+(\d+:\d+)', text)
             if score_match:
                 row[alias] = score_match.group(1)
+
     print(f"Row obtained: {row}")
     return row
 
@@ -48,12 +52,18 @@ def write_csv(results):
     csv_file = project_root / "scores.csv"
     file_exists = csv_file.exists()
 
+    # Define the column order explicitly:
+    columns = ["Day", "DoW", "Me", "HK", "AH", "AS", "JM", "ZK", "Backtracking"]
+
     with open(csv_file, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["Day", "DoW"] + list(alias_dict.values()))
+        writer = csv.DictWriter(f, fieldnames=columns)
         if not file_exists:
             writer.writeheader()
 
-        writer.writerow(row)
+        # Ensure all columns are present in row dict, fill missing with empty string
+        row_filled = {col: row.get(col, '') for col in columns}
+
+        writer.writerow(row_filled)
 
     print(f"Row written to {csv_file.name}: {row}")
 
