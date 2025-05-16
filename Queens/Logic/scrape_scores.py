@@ -5,15 +5,6 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 from bs4 import BeautifulSoup
 import time
 import re
-from dotenv import load_dotenv
-import os
-from pathlib import Path
-import csv
-
-project_root = Path(__file__).resolve().parent.parent
-load_dotenv(dotenv_path=project_root / ".env")
-
-from scraper import initialise_driver
 
 def scroll_chat(driver, key_presses=150, pause=0.03):
     """
@@ -150,49 +141,3 @@ def score_scraper(driver, name):
         return results
     except Exception as e:
         print(f"Could not find button for {name}: {e}")
-
-def main():
-    COOKIE_FILE = "linkedin_cookies.pkl"
-    name = "Aryaan Hussain"
-    driver = initialise_driver(COOKIE_FILE)
-    results = score_scraper(driver, name)
-    def name_to_env_key(name):
-        return "ALIAS_" + name.upper().replace(" ", "_")
-
-    # Build alias dict directly from os.environ
-    alias_dict = {
-        key: value for key, value in os.environ.items() if key.startswith("ALIAS_")
-    }
-
-    # Extract day
-    day_match = re.search(r'Queens\s+#(\d+)', results[0][1])
-    day = int(day_match.group(1)) if day_match else None
-
-    # Build row
-    row = {"Day": day}
-    for name, text in results:
-        alias = alias_dict.get(name_to_env_key(name))
-        if alias:
-            score_match = re.search(r'\|\s+(\d+:\d+)', text)
-            if score_match:
-                row[alias] = score_match.group(1)
-
-    print("✅ Row:", row)
-
-    # Path to Queens/scores.csv
-    csv_file = project_root / "scores.csv"
-
-    # Check if the file exists
-    file_exists = csv_file.exists()
-
-    # Write or append row
-    with open(csv_file, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["Day"] + list(alias_dict.values()))
-        if not file_exists:
-            writer.writeheader()
-        writer.writerow(row)
-
-    print(f"✅ Row written to {csv_file.name}: {row}")
-
-if __name__ == "__main__":
-    main()

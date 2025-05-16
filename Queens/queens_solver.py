@@ -38,5 +38,5 @@ def main(cookie_file, name):
 
 if __name__ == "__main__":
     COOKIE_FILE = "linkedin_cookies.pkl"
-    name = "Aadam Ul Haq"
+    name = "Queens + Zip Daily"
     main(COOKIE_FILE, name)
