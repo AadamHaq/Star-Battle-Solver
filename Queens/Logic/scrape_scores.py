@@ -6,13 +6,13 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def scroll_chat(driver, key_presses=250, pause=0.03):
+def scroll_chat(driver, key_presses=200, pause=0.03):
     """
     Function: Scrolls up the LinkedIn group chat to load more messages
 
     Args:
         driver: Selenium driver that was initialised
-        key_presses: Number of times Up Key is pressed. Default is 250
+        key_presses: Number of times Up Key is pressed. Default is 200
         pause: Seconds between each key press
 
     Description: Scrolls up using up keys after pressing within the chat container

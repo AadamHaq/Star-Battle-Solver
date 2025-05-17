@@ -38,7 +38,7 @@ def prepare_csv(results):
         print(f"Processing name '{name}' → alias key '{alias_key}' → alias value '{alias}'")
 
         if alias:
-            score_match = re.search(r'\|\s+(\d+:\d+)', text)
+            score_match = re.search(r'(\d{1,2}:\d{2})', text)
             if score_match:
                 row[alias] = score_match.group(1)
 

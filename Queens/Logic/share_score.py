@@ -41,11 +41,6 @@ def share_score(driver, name):
 
     time.sleep(0.5)
 
-    input_box = driver.find_element(By.XPATH, "//input[@placeholder='Type a name']") # Type group chat name
-    input_box.send_keys(name + Keys.ENTER)
-
-    time.sleep(1)
-
     try:
         send_to = driver.find_element(
             By.XPATH,
@@ -54,6 +49,20 @@ def share_score(driver, name):
             "/ancestor::button"
         )
         send_to.click()
+    except:
+        input_box = driver.find_element(By.XPATH, "//input[@placeholder='Type a name']") # Type group chat name
+        input_box.send_keys(name + Keys.ENTER)
+
+        time.sleep(1)
+
+        send_to = driver.find_element(
+            By.XPATH,
+            f"//div[@class='msg-connections-typeahead__entity-description']"
+            f"[.//dt[contains(normalize-space(), '{name}')]]" # Name of person to send to and click
+            "/ancestor::button"
+        )
+        send_to.click()
+    try:
         time.sleep(0.5)
         textbox = driver.find_element(
             By.XPATH,
