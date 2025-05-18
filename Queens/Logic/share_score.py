@@ -39,7 +39,7 @@ def share_score(driver, name):
     )
     send_button.click()
 
-    time.sleep(0.5)
+    time.sleep(3.5)
 
     try:
         send_to = driver.find_element(
