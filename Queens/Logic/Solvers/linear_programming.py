@@ -37,7 +37,7 @@ Example board:
             x_pq + x_{p-1}{q-1} <= 1
 """
 from z3 import Bool, Solver, Sum, If, Or, Not, sat
-from pulp import LpProblem, LpVariable, lpSum, LpMinimize, LpBinary, LpStatus, value
+from pulp import LpProblem, LpVariable, lpSum, LpMinimize, LpBinary, LpStatus
 import time
 
 

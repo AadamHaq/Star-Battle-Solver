@@ -16,7 +16,7 @@ def name_to_env_key(name):
 
 def get_dow(day):
     dow_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    return dow_names[(day % 7) + 2]  # Monday is day % 7 == 6 → index 6 = "Sat"
+    return dow_names[((day + 2) % 7)]  # Monday is day % 7 == 6 → index 6 = "Sat"
 
 # Build alias dict directly from os.environ
 alias_dict = {

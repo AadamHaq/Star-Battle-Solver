@@ -7,7 +7,7 @@ Inspiration for the code:
 """
 
 from typing import List, Set, Tuple
-
+import time
 
 def is_valid(
     row: int,
@@ -115,4 +115,24 @@ def backtracking(
             # Next pass will therefore return to original row that was looked but at the next column spot
 
     return []  # No solution found
+
+
+if __name__ == "__main__":
+    test_board = [
+    [0, 1, 1, 2, 3, 3, 3, 4],
+    [0, 0, 1, 2, 2, 3, 3, 4],
+    [5, 0, 0, 0, 0, 3, 3, 4],
+    [5, 5, 0, 0, 0, 0, 3, 4],
+    [6, 6, 0, 0, 0, 0, 3, 0],
+    [7, 6, 0, 0, 0, 0, 0, 0],
+    [7, 7, 7, 0, 0, 0, 0, 0],
+    [7, 7, 7, 7, 7, 0, 0, 0],
+    ]
+    start = time.time()
+    backtracking(test_board)
+    end = time.time()
+    print(f"Backtracking Time: {end - start:4f} seconds \n")
+
+    # Instant - 0.00000s
+    # Better than Linear Programming currently
 
