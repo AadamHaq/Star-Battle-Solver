@@ -86,7 +86,6 @@ def scraper(driver):
     assert rows == cols, "Grid should be square"
 
     size = rows
-    board_matrix = [[None for _ in range(size)] for _ in range(size)]
     colour_region_matrix = [[None for _ in range(size)] for _ in range(size)]
 
     """
@@ -125,8 +124,8 @@ def scraper(driver):
         class_attr = entry["classAttr"]
         aria = entry["aria"]
 
-        color_match = re.search(r"cell-color-(\d+)", class_attr)
-        color_index = int(color_match.group(1)) if color_match else None
+        colour_match = re.search(r"cell-color-(\d+)", class_attr)
+        colour_index = int(colour_match.group(1)) if colour_match else None
 
         aria_match = re.search(r"row (\d+), column (\d+)", aria)
         if not aria_match:
@@ -135,7 +134,7 @@ def scraper(driver):
         row = int(aria_match.group(1)) - 1
         col = int(aria_match.group(2)) - 1
 
-        colour_region_matrix[row][col] = color_index
+        colour_region_matrix[row][col] = colour_index
 
     # We now quit in the inputter
     # driver.quit()

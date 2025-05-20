@@ -1,8 +1,8 @@
 """
-Will research implementing computer vision and add it here
-"""
+Sources: https://www.geeksforgeeks.org/opencv-python-tutorial/
+https://towardsdatascience.com/solving-linkedin-queens-game-cfeea7a26e86/ - Used as a starting inspiration but quickly diverged from this solution
 
-"""
+
 Old version
 
 import cv2 as cv
@@ -46,75 +46,7 @@ for row in range(board_size):
         board[row][col] = unique_colors[color]
 
 print(board)
-"""
 
-import cv2 as cv
-import numpy as np
-
-# Load image and resize to standardise
-image = cv.imread("Queens/example_board.png")
-resized = cv.resize(image, (350, 350))
-
-# Convert to grayscale and edge detection
-gray = cv.cvtColor(resized, cv.COLOR_BGR2GRAY)
-edges = cv.Canny(gray, 50, 150, apertureSize=3) # Uses Canny algorithm
-
-# Use Hough Transform to detect straight lines in the image
-# Converts edge points from Canny alg. into votes and if a certain line gets many votes, it is a line
-lines = cv.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=50, maxLineGap=10)
-
-# Separate vertical and horizontal lines
-horizontal_lines = []
-vertical_lines = []
-
-for line in lines:
-    x1, y1, x2, y2 = line[0]
-    if abs(x1 - x2) < 10:  # Vertical Line
-        vertical_lines.append(x1)
-    elif abs(y1 - y2) < 10:  # Horizontal Line
-        horizontal_lines.append(y1)
-
-# Cluster close lines as some lines may be repeated
-def cluster_lines(lines, threshold=10):
-    lines = sorted(set(lines)) # Removes duplicates and sorts
-    clustered = []
-    for l in lines:
-        if not clustered or abs(l - clustered[-1]) > threshold:
-            clustered.append(l)
-    return clustered
-
-cols = cluster_lines(vertical_lines)
-rows = cluster_lines(horizontal_lines)
-
-num_rows = len(rows) - 1
-num_cols = len(cols) - 1
-
-# Initialize board with -1
-board = [[-1 for _ in range(num_cols)] for _ in range(num_rows)]
-
-# Assign colour IDs based on center of each cell
-unique_colours = {}
-colour_index = 0
-
-for i in range(num_rows):
-    for j in range(num_cols):
-        y = (rows[i] + rows[i+1]) // 2 # Centre of height of cell
-        x = (cols[j] + cols[j+1]) // 2 # Centre of width of cell
-        colour = tuple(resized[y, x])
-
-        if colour not in unique_colours:
-            unique_colours[colour] = colour_index
-            colour_index += 1
-
-        board[i][j] = unique_colours[colour]
-
-print("board = [")
-for row in board:
-    print("", row, ",")
-print("]")
-
-
-"""
 Output:
 [[0, 0, 0, 1, 1, 1, 1],
 [2, 0, 3, 3, 3, 1, 1],
@@ -124,3 +56,91 @@ Output:
 [5, 4, 3, 3, 3, 4, 4],
 [4, 4, 4, 4, 4, 4, 4]]
 """
+
+import cv2 as cv
+import numpy as np
+from selenium.webdriver.common.by import By
+from Logic.scraper import initialise_driver
+
+def get_image(driver):
+
+    driver.get("https://www.linkedin.com/games/queens") 
+
+    board = driver.find_element(By.ID, "queens-grid")
+
+    board.screenshot("board_screenshot.png")
+    print("Screenshot obtained")
+
+
+def computer_vision(path):
+    # Load image and resize to standardise
+    image = cv.imread(path)
+    resized = cv.resize(image, (350, 350))
+
+    # Convert to grayscale and edge detection
+    gray = cv.cvtColor(resized, cv.COLOR_BGR2GRAY)
+    edges = cv.Canny(gray, 50, 150, apertureSize=3) # Uses Canny algorithm
+
+    # Use Hough Transform to detect straight lines in the image
+    # Converts edge points from Canny alg. into votes and if a certain line gets many votes, it is a line
+    lines = cv.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=50, maxLineGap=10)
+
+    # Separate vertical and horizontal lines
+    horizontal_lines = []
+    vertical_lines = []
+
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        if abs(x1 - x2) < 10:  # Vertical Line
+            vertical_lines.append(x1)
+        elif abs(y1 - y2) < 10:  # Horizontal Line
+            horizontal_lines.append(y1)
+
+    # Cluster close lines as some lines may be repeated
+    def cluster_lines(lines, threshold=10):
+        lines = sorted(set(lines)) # Removes duplicates and sorts
+        clustered = []
+        for l in lines:
+            if not clustered or abs(l - clustered[-1]) > threshold:
+                clustered.append(l)
+        return clustered
+
+    cols = cluster_lines(vertical_lines)
+    rows = cluster_lines(horizontal_lines)
+
+    num_rows = len(rows) - 1
+    num_cols = len(cols) - 1
+
+    if num_rows != num_cols:
+        raise ValueError(f"Detected board is not square: {num_rows} rows, {num_cols} cols")
+    
+    size = num_rows
+
+    # Initialize board with -1
+    board = [[-1 for _ in range(num_cols)] for _ in range(num_rows)]
+
+    # Assign colour IDs based on center of each cell
+    unique_colours = {}
+    colour_index = 0
+
+    for i in range(size):
+        for j in range(size):
+            y = (rows[i] + rows[i+1]) // 2 # Centre of height of cell
+            x = (cols[j] + cols[j+1]) // 2 # Centre of width of cell
+            colour = tuple(resized[y, x])
+
+            if colour not in unique_colours:
+                unique_colours[colour] = colour_index
+                colour_index += 1
+
+            board[i][j] = unique_colours[colour]
+
+    return board
+
+
+if __name__ == "__main__":
+    cookie_file = "linkedin_cookies.pkl"
+    driver = initialise_driver(cookie_file)
+    get_image(driver)
+    board = computer_vision("board_screenshot.png")
+    print(board)
