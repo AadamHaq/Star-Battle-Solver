@@ -71,6 +71,13 @@ def get_image(driver):
     board.screenshot("board_screenshot.png")
     print("Screenshot obtained")
 
+def get_image_training(driver, number):
+
+    driver.get(f"https://queensgame.vercel.app/level/{number}")
+
+    board = driver.find_element(By.CLASS_NAME, "board")
+
+    board.screenshot(f"test_board_{number}.png")
 
 def computer_vision(path):
     # Load image and resize to standardise
@@ -141,6 +148,10 @@ def computer_vision(path):
 if __name__ == "__main__":
     cookie_file = "linkedin_cookies.pkl"
     driver = initialise_driver(cookie_file)
-    get_image(driver)
-    board = computer_vision("board_screenshot.png")
-    print(board)
+    # get_image(driver)
+    # board = computer_vision("board_screenshot.png")
+    # print(board)
+    for i in range(21,30):
+        get_image_training(driver, i)
+        board = computer_vision(f"test_board_{i}.png")
+        print(board)
