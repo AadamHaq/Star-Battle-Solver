@@ -62,7 +62,7 @@ import numpy as np
 from selenium.webdriver.common.by import By
 import os
 import time
-from scraper import initialise_driver
+from Logic.game_scraper import initialise_driver
 
 def get_image(driver,path):
 

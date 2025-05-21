@@ -1,7 +1,7 @@
-from Logic.scraper import initialise_driver
-from Logic.scrape_scores import score_scraper
-from Logic.plotter import write_csv, plot_graph
-from Logic.upload_plot import upload_plot
+from Queens.Logic.game_scraper import initialise_driver
+from Queens.Logic.scrape_scores_from_messages import score_scraper
+from Queens.Logic.plot_scores import write_csv, plot_graph
+from Queens.Logic.upload_and_share_plot import upload_plot
 
 def main(cookie_file, name):
     driver = initialise_driver(cookie_file)

@@ -1,7 +1,7 @@
-from Logic.scraper import initialise_driver, scraper
+from Logic.game_scraper import initialise_driver, scraper
 from Logic.Solvers.naive_backtracking import backtracking
-from Logic.inputter import input_solution
-from Logic.share_score import share_score
+from Logic.game_inputter import input_solution
+from Logic.share_score_after_play import share_score
 from Logic.computer_vision import get_image, computer_vision
 import time
 
