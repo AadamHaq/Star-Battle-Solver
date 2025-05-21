@@ -161,10 +161,10 @@ if __name__ == "__main__":
             print("Skipped")
             continue
         img_path = os.path.join(img_save, f"queens_board_{i}.png")
-        txt_path = os.path.join(save_dir, f"queens{i}.txt")
+        txt_path = os.path.join(txt_save, f"queens{i}.txt")
 
         driver.get(f"https://queensgame.vercel.app/level/{i}")
-        driver.execute_script("document.body.style.zoom='85%'")
+        driver.execute_script("document.body.style.zoom='80%'")
         time.sleep(0.5)
         board_elem = driver.find_element(By.CLASS_NAME, "board")
         board_elem.screenshot(img_path)
