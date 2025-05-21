@@ -2,6 +2,7 @@ from Logic.scraper import initialise_driver, scraper
 from Logic.Solvers.naive_backtracking import backtracking
 from Logic.inputter import input_solution
 from Logic.share_score import share_score
+from Logic.computer_vision import get_image, computer_vision
 import time
 
 def main(cookie_file, name):
@@ -18,12 +19,19 @@ def main(cookie_file, name):
     """
 
     driver = initialise_driver(cookie_file)
+    try:
+        path = "queens_board.png"
+        get_image(driver, path)
+        board = computer_vision(path)
+        N = len(board)
+        print(board)
 
-    data = scraper(driver)
+    except:
+        data = scraper(driver)
 
-    board = data['board']
-    N = data['board_size']
-    print(board)
+        board = data['board']
+        N = data['board_size']
+        print(board)
     solution = backtracking(board, N)
 
     print(solution)
