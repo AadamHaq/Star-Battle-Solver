@@ -114,7 +114,7 @@ def scrape_messages_bs4(driver):
             continue
         text = bubble.get_text("\n", strip=True) # Strip blank space
         first = next((line for line in text.splitlines() if line.strip()), "") # Strip new lines
-        if re.match(r"^Queens #\d{3}", first): # Find Queens message
+        if re.match(r"^Queens #(\d{3})(?!\d)\b", first): # Find Queens message
             results.append((current_sender, text)) # Append
 
     return results
