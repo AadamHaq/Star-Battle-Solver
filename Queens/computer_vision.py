@@ -60,24 +60,24 @@ Output:
 import cv2 as cv
 import numpy as np
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from Logic.scraper import initialise_driver
+import os
+import time
 
 def get_image(driver):
 
     driver.get("https://www.linkedin.com/games/queens") 
 
+    driver.execute_script("document.body.style.zoom='70%'")
+
+    time.sleep(0.5)
+
     board = driver.find_element(By.ID, "queens-grid")
 
     board.screenshot("board_screenshot.png")
     print("Screenshot obtained")
-
-def get_image_training(driver, number):
-
-    driver.get(f"https://queensgame.vercel.app/level/{number}")
-
-    board = driver.find_element(By.CLASS_NAME, "board")
-
-    board.screenshot(f"test_board_{number}.png")
 
 def computer_vision(path):
     # Load image and resize to standardise
@@ -151,7 +151,30 @@ if __name__ == "__main__":
     # get_image(driver)
     # board = computer_vision("board_screenshot.png")
     # print(board)
-    for i in range(21,30):
-        get_image_training(driver, i)
-        board = computer_vision(f"test_board_{i}.png")
+    img_save = "Queens/Logic/Solvers/RL_Resources/Training_Data/Images"
+    os.makedirs(img_save, exist_ok=True)
+    txt_save = "Queens/Logic/Solvers/RL_Resources/Training_Data/Metadata"
+    os.makedirs(txt_save, exist_ok=True)
+
+    for i in range(1, 387):
+        if i in [4,7,9,13,14,18,19,20]:
+            print("Skipped")
+            continue
+        img_path = os.path.join(img_save, f"queens_board_{i}.png")
+        txt_path = os.path.join(save_dir, f"queens{i}.txt")
+
+        driver.get(f"https://queensgame.vercel.app/level/{i}")
+        driver.execute_script("document.body.style.zoom='85%'")
+        time.sleep(0.5)
+        board_elem = driver.find_element(By.CLASS_NAME, "board")
+        board_elem.screenshot(img_path)
+
+        board = computer_vision(img_path)
         print(board)
+
+        # Save the board matrix to text file
+        with open(txt_path, "w") as f:
+            f.write("queens_board = [\n")
+            for row in board:
+                f.write(f"  {row},\n")
+            f.write("]\n")
