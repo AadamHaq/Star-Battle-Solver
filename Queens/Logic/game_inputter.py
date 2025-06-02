@@ -35,7 +35,7 @@ def input_solution(driver, solution):
                 c = int(match.group(2))
                 if r == row and c == col:
                     print(f"Placing queen at row {r}, col {c}")
-                    actions.move_to_element(cell).pause(0.07).double_click().perform()
+                    actions.move_to_element(cell).pause(0.05).double_click().perform()
                     time.sleep(0.05)
                     found = True
                     break

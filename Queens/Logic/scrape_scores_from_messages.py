@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def scroll_chat(driver, key_presses=200, pause=0.03):
+def scroll_chat(driver, key_presses=150, pause=0.03):
     """
     Function: Scrolls up the LinkedIn group chat to load more messages
 

@@ -35,7 +35,7 @@ def main(cookie_file, name):
     solution = backtracking(board, N)
 
     print(solution)
-    solution_1_indexed = [(r + 1, c + 1) for r, c in sorted(solution)] # Sorted purely for visual purposes
+    solution_1_indexed = [(r + 1, c + 1) for r, c in solution]
     input_solution(driver, solution_1_indexed)
 
     time.sleep(5)
