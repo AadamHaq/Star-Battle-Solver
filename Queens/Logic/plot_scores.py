@@ -150,7 +150,7 @@ def plot_graph():
     ax.set_xticklabels(x_labels)
 
     # Set y-axis limit to 5 minutes
-    ax.set_ylim(0, 480)
+    ax.set_ylim(0, 360)
 
     # Format y-axis ticks to mm:ss
     def format_mmss(x, _):
