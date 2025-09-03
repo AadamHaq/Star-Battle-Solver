@@ -111,9 +111,19 @@ def get_fun_fact(df):
 
     # Find player with the current longest win streak
     best_player = max(current_streaks, key=current_streaks.get)
-    if current_streaks[best_player] > 0:
+    if current_streaks[best_player] > 1:  # only count streaks > 1
         name = alias_map.get(best_player, best_player)
         fun_facts.append(f"🔥 {name} is on a {current_streaks[best_player]}-day win streak!")
+
+    # --- Big drop check (yesterday 1st → today last) ---
+    if len(df_secs) >= 2:
+        yesterday = df_secs.iloc[-2][players].dropna()
+        if not yesterday.empty and not today_valid.empty:
+            yesterday_winner = yesterday.idxmin()
+            today_loser = today_valid.idxmax()
+            if yesterday_winner == today_loser:
+                name = alias_map.get(yesterday_winner, yesterday_winner)
+                fun_facts.append(f"⬇️ {name} went from 1st yesterday to last today!")
 
     # --- Pick one fact to show ---
     if fun_facts:

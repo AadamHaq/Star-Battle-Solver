@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def scroll_chat(driver, key_presses=150, pause=0.03):
+def scroll_chat(driver, key_presses=200, pause=0.03):
     """
     Function: Scrolls up the LinkedIn group chat to load more messages
 
@@ -16,16 +16,15 @@ def scroll_chat(driver, key_presses=150, pause=0.03):
         pause: Seconds between each key press
 
     Description: Scrolls up using up keys after pressing within the chat container
-    Future: Send message in gc saying 'Scraping'?
     """
-    for attempt in range(3): # Multiple attempts as it sometimes doesn't work
+    for attempt in range(3):  # Multiple attempts as it sometimes doesn't work
         try:
-            bubbles = driver.find_elements(By.CSS_SELECTOR, ".msg-s-event-listitem__message-bubble") # Find the inside of the chatbox
+            bubbles = driver.find_elements(By.CSS_SELECTOR, ".msg-s-event-listitem__message-bubble")  # Find the inside of the chatbox
             if not bubbles:
                 print("No message bubbles found to scroll.")
                 time.sleep(1)
                 continue
-            target = bubbles[-1] # Latest message
+            target = bubbles[-1]  # Latest message
             driver.execute_script("arguments[0].scrollIntoView(true);", target)
             time.sleep(0.3)
 
@@ -33,22 +32,26 @@ def scroll_chat(driver, key_presses=150, pause=0.03):
             ActionChains(driver).move_to_element_with_offset(target, offset_x, offset_y).click().perform()
             time.sleep(0.3)
 
-            for i in range(key_presses):
+            for i in range(1, key_presses + 1):
                 target.send_keys(Keys.ARROW_UP)
                 time.sleep(pause)
 
-                # After 50 presses, click again at the same offset
-                if i == 49:
-                    ActionChains(driver).move_to_element_with_offset(target, offset_x, offset_y).click().perform()
-                    time.sleep(0.3)
+                # Every multiple of 50, send 2 Down Arrows
+                if i % 50 == 0:
+                    target.send_keys(Keys.ARROW_DOWN)
+                    time.sleep(pause)
+                    target.send_keys(Keys.ARROW_DOWN)
+                    time.sleep(pause)
 
-            print(f"Scrolled chat by sending {key_presses} UP arrow keys with intermediate click.")
+            print(f"Scrolled chat by sending {key_presses} UP arrow keys with 2 DOWN arrows every 50 presses.")
             return True
+
         except (StaleElementReferenceException, NoSuchElementException):
             print(f"Attempt {attempt+1}: Encountered stale element, retrying...")
             time.sleep(1)
     print("Failed to scroll chat by keys after retries.")
     return False
+
 
 def get_chat_html(driver):
     """
