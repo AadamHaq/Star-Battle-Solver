@@ -14,12 +14,6 @@ def share_score(driver, name):
     Description: Removes pop up for streak freeze, scrolls down and shares score
     to a group chat name entered.
     """
-    try: # Streak freeze pop up problem. May need to change button path here when it comes back again
-        got_it_button = driver.find_element(By.XPATH, "//button[text()='Got it']")
-        got_it_button.click()
-        time.sleep(0.5)
-    except:
-        pass  # No pop-up, continue normally
 
     # Click on page at crown photo (not a hyperlink) so scrolling works
     image_section = driver.find_element(By.CSS_SELECTOR, ".pr-top__image")
@@ -58,8 +52,9 @@ def share_score(driver, name):
         send_to = driver.find_element(
             By.XPATH,
             f"//div[@class='msg-connections-typeahead__entity-description']"
-            f"[.//dt[contains(normalize-space(), '{name}')]]" # Name of person to send to and click
-            "/ancestor::button"
+            f"[.//dt[contains(normalize-space(), '{name}')]]"
+            "/ancestor::div[contains(@class, 'msg-connections-typeahead__search-result-row')]"
+            "//label[contains(@class, 'msg-connections-typeahead__checkbox-multisend')]"
         )
         send_to.click()
     try:

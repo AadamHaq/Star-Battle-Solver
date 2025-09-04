@@ -40,7 +40,6 @@ def get_fun_fact(df):
 
     # Use most recent row as "today"
     today = df_secs.iloc[-1]
-    prev = df_secs.iloc[:-1]   # everything except today
     last14 = df_secs.iloc[-15:-1]  # last 14 days before today
 
     fun_facts = []

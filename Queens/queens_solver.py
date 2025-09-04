@@ -19,6 +19,7 @@ def main(cookie_file, name):
     """
 
     driver = initialise_driver(cookie_file)
+
     try:
         path = "queens_board.png"
         get_image(driver, path)
@@ -40,6 +41,16 @@ def main(cookie_file, name):
 
     time.sleep(5)
 
+    # Inject auto-clean for LinkedIn modals
+    driver.execute_script("""
+        const observer = new MutationObserver(() => {
+            document.querySelectorAll(".artdeco-modal[role='dialog']")
+                .forEach(el => el.remove());
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    """)
+
+    time.sleep(1)
     share_score(driver, name)
 
     driver.quit()
