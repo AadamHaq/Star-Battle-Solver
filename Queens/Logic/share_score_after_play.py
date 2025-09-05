@@ -1,6 +1,7 @@
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 import time
 
 def share_score(driver, name):
@@ -14,6 +15,17 @@ def share_score(driver, name):
     Description: Removes pop up for streak freeze, scrolls down and shares score
     to a group chat name entered.
     """
+
+    try:
+        skip_btn = driver.find_element(
+            By.XPATH,
+            "//div[@role='dialog']//button[.//span[normalize-space()='Skip']]"
+        )
+        skip_btn.click()
+        print("✅ Bonus popup closed")
+    except NoSuchElementException:
+        # Popup not present, ignore
+        pass
 
     # Click on page at crown photo (not a hyperlink) so scrolling works
     image_section = driver.find_element(By.CSS_SELECTOR, ".pr-top__image")

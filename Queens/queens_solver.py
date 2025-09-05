@@ -40,17 +40,6 @@ def main(cookie_file, name):
     input_solution(driver, solution_1_indexed)
 
     time.sleep(5)
-
-    # Inject auto-clean for LinkedIn modals
-    driver.execute_script("""
-        const observer = new MutationObserver(() => {
-            document.querySelectorAll(".artdeco-modal[role='dialog']")
-                .forEach(el => el.remove());
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    """)
-
-    time.sleep(1)
     share_score(driver, name)
 
     driver.quit()
