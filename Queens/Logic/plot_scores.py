@@ -171,7 +171,6 @@ def plot_graph():
 
     # Save and show
     plt.savefig("queens_scores_plot.png")
-    plt.show()
 
 
 def main():

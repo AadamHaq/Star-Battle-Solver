@@ -65,7 +65,7 @@ def get_fun_fact(df):
             # Use the maximum time among the bad players for display
             max_secs = bad_day.max()
             fun_facts.append(
-                f"😬 {name_str} had a bad day with up to {int(max_secs//60)}:{int(max_secs%60):02d}"
+                f"😬 {name_str} had a bad day with a time of up to {int(max_secs//60)}:{int(max_secs%60):02d}"
             )
 
     # --- Most improved (today vs average of last 14 days) ---

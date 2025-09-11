@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def scroll_chat(driver, key_presses=200, pause=0.03):
+def scroll_chat(driver, key_presses=132, pause=0.03):
     """
     Function: Scrolls up the LinkedIn group chat to load more messages
 
@@ -36,14 +36,14 @@ def scroll_chat(driver, key_presses=200, pause=0.03):
                 target.send_keys(Keys.ARROW_UP)
                 time.sleep(pause)
 
-                # Every multiple of 50, send 2 Down Arrows
-                if i % 50 == 0:
+                # Every multiple of 33, send 2 Down Arrows
+                if i % 33 == 0:
                     target.send_keys(Keys.ARROW_DOWN)
                     time.sleep(pause)
                     target.send_keys(Keys.ARROW_DOWN)
                     time.sleep(pause)
 
-            print(f"Scrolled chat by sending {key_presses} UP arrow keys with 2 DOWN arrows every 50 presses.")
+            print(f"Scrolled chat by sending {key_presses} UP arrow keys with 2 DOWN arrows every 33 presses.")
             return True
 
         except (StaleElementReferenceException, NoSuchElementException):
