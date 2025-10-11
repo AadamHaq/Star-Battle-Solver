@@ -65,7 +65,7 @@ def get_fun_fact(df):
             # Use the maximum time among the bad players for display
             max_secs = bad_day.max()
             fun_facts.append(
-                f"😬 {name_str} had a bad day with a time of up to {int(max_secs//60)}:{int(max_secs%60):02d}"
+                f"😬 {name_str} had a bad day with a time of up to {int(max_secs//60)}:{int(max_secs%60):02d}... maybe Haris played on their phone"
             )
 
     # --- Most improved (today vs average of last 14 days) ---
@@ -122,7 +122,7 @@ def get_fun_fact(df):
             today_loser = today_valid.idxmax()
             if yesterday_winner == today_loser:
                 name = alias_map.get(yesterday_winner, yesterday_winner)
-                fun_facts.append(f"⬇️ {name} went from 1st yesterday to last today!")
+                fun_facts.append(f"⬇️ {name} went from 1st to last overnight... someone had a bad sleep!")
 
     # --- Pick one fact to show ---
     if fun_facts:
