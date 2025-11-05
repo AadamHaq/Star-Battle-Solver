@@ -135,21 +135,34 @@ def plot_graph():
         if col not in ["Day", "DoW"]:
             df_seconds[col] = df[col].apply(time_to_seconds)
 
-    # Plot
-    plt.figure(figsize=(10, 6))
-    for col in df_seconds.columns:
-        if col not in ["Day", "DoW"]:
-            plt.plot(df_seconds["Day"], df_seconds[col], marker='o', label=col)
+    # Create figure with larger size
+    fig, ax = plt.subplots(figsize=(16, 8))
+    
+    # Define distinct colors and markers for each player
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2']
+    markers = ['o', 's', '^', 'D', 'v', 'p', '*']
+    
+    # Plot each player with distinct styling (skip Backtracking)
+    player_cols = [col for col in df_seconds.columns if col not in ["Day", "DoW", "Backtracking", "ZK"]]
+    for idx, col in enumerate(player_cols):
+        ax.plot(df_seconds["Day"], df_seconds[col], 
+                marker=markers[idx % len(markers)], 
+                color=colors[idx % len(colors)],
+                label=col, 
+                linewidth=2.5,
+                markersize=6,
+                alpha=0.8)
 
-    ax = plt.gca()
-
-    # Set x-axis labels with Day and DoW
+    # Improve x-axis readability
     x_ticks = df_seconds["Day"]
     x_labels = [f"{day}\n{dow}" for day, dow in zip(df_seconds["Day"], df_seconds["DoW"])]
-    ax.set_xticks(x_ticks)
-    ax.set_xticklabels(x_labels)
-
-    # Set y-axis limit to 5 minutes
+    
+    # Show every 7th label to reduce crowding (weekly intervals)
+    tick_spacing = 7
+    ax.set_xticks(x_ticks[::tick_spacing])
+    ax.set_xticklabels(x_labels[::tick_spacing], fontsize=10, rotation=0)
+    
+    # Set y-axis limit to 6 minutes for better visibility
     ax.set_ylim(0, 360)
 
     # Format y-axis ticks to mm:ss
@@ -160,17 +173,32 @@ def plot_graph():
         return f"{m}:{s:02}"
 
     ax.yaxis.set_major_formatter(FuncFormatter(format_mmss))
+    
+    # Increase y-axis tick frequency
+    ax.set_yticks(range(0, 361, 30))  # Every 30 seconds
 
     # Labels and styling
-    plt.xlabel("Day")
-    plt.ylabel("Time (mm:ss)")
-    plt.title("Queens Scores Over Time")
-    plt.legend(title="Player")
-    plt.grid(True)
+    ax.set_xlabel("Day (Day of Week)", fontsize=12, fontweight='bold')
+    ax.set_ylabel("Time (mm:ss)", fontsize=12, fontweight='bold')
+    ax.set_title("Queens Scores Over Time", fontsize=16, fontweight='bold', pad=20)
+    
+    # Improve legend - place outside plot area
+    ax.legend(title="Player", loc='center left', bbox_to_anchor=(1, 0.5), 
+             fontsize=11, title_fontsize=12, framealpha=0.95, 
+             shadow=True, fancybox=True)
+    
+    # Add grid for better readability
+    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+    ax.set_axisbelow(True)  # Put grid behind data
+    
+    # Add subtle background color
+    ax.set_facecolor('#f8f9fa')
+    
     plt.tight_layout()
 
-    # Save and show
-    plt.savefig("queens_scores_plot.png")
+    # Save with high DPI for better quality
+    plt.savefig("queens_scores_plot.png", dpi=300, bbox_inches='tight')
+    print("Plot saved as queens_scores_plot.png")
 
 
 def main():
