@@ -40,7 +40,7 @@ def get_fun_fact(df):
 
     # Use most recent row as "today"
     today = df_secs.iloc[-1]
-    last14 = df_secs.iloc[-15:-1]  # last 14 days before today
+    # last14 = df_secs.iloc[-15:-1]  # last 14 days before today
 
     fun_facts = []
 
@@ -68,30 +68,30 @@ def get_fun_fact(df):
                 f"😬 {name_str} had a bad day with a time of up to {int(max_secs//60)}:{int(max_secs%60):02d}... maybe Haris played on their phone"
             )
 
-    # --- Most improved (today vs average of last 14 days) ---
-    if not today_valid.empty:
-        improvements = {}
-        for p in players:
-            if not pd.isna(today[p]):
-                past_avg = last14[p].dropna().mean()
-                if past_avg and past_avg > 0:
-                    diff = past_avg - today[p]
-                    improvements[p] = diff
-        if improvements:
-            most_improved = max(improvements, key=improvements.get)
-            gain = improvements[most_improved]
-            if gain > 0:
-                name = alias_map.get(most_improved, most_improved)
-                fun_facts.append(f"📈 Most improved: {name}, {int(gain)}s faster than his 2-week average!")
+    # # --- Most improved (today vs average of last 14 days) ---
+    # if not today_valid.empty:
+    #     improvements = {}
+    #     for p in players:
+    #         if not pd.isna(today[p]):
+    #             past_avg = last14[p].dropna().mean()
+    #             if past_avg and past_avg > 0:
+    #                 diff = past_avg - today[p]
+    #                 improvements[p] = diff
+    #     if improvements:
+    #         most_improved = max(improvements, key=improvements.get)
+    #         gain = improvements[most_improved]
+    #         if gain > 0:
+    #             name = alias_map.get(most_improved, most_improved)
+    #             fun_facts.append(f"📈 Most improved: {name}, {int(gain)}s faster than his 2-week average!")
 
     # --- Best recent average (last 14 days) ---
-    averages = {p: last14[p].dropna().mean() for p in players}
-    averages = {p: v for p, v in averages.items() if v and not np.isnan(v)}
-    if averages:
-        best_avg_player = min(averages, key=averages.get)
-        best_avg_time = averages[best_avg_player]
-        name = alias_map.get(best_avg_player, best_avg_player)
-        fun_facts.append(f"🔥 Best 2-week average: {name} with {int(best_avg_time//60)}:{int(best_avg_time%60):02d}")
+    # averages = {p: last14[p].dropna().mean() for p in players}
+    # averages = {p: v for p, v in averages.items() if v and not np.isnan(v)}
+    # if averages:
+    #     best_avg_player = min(averages, key=averages.get)
+    #     best_avg_time = averages[best_avg_player]
+    #     name = alias_map.get(best_avg_player, best_avg_player)
+    #     fun_facts.append(f"🔥 Best 2-week average: {name} with {int(best_avg_time//60)}:{int(best_avg_time%60):02d}")
 
     # --- Current win streaks (consecutive days with valid times) ---
     winners = df_secs[players].idxmin(axis=1)

@@ -41,7 +41,12 @@ def initialise_driver(cookie_file):
     Description: Initialises the driver, launches LinkedIn and loads the cookies
     """
     chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
+    if os.environ.get('SESSIONNAME') != 'Console':
+        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--window-size=1920,1080")
+    else:
+        chrome_options.add_argument("--start-maximized")
+
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 

@@ -1,10 +1,12 @@
 @echo off
+chcp 65001 > nul
+set PYTHONIOENCODING=utf-8
 cd /d "C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver"
 if not exist "%CD%\logs" mkdir "%CD%\logs"
 
 echo ===== START %DATE% %TIME% ===== >> "%CD%\logs\queens_solver.log"
 
-uv run python "Queens\queens_solver.py" >> "%CD%\logs\queens_solver.log" 2>&1
+"C:\Users\user\.local\bin\uv.exe" run python "Queens\queens_solver.py" >> "%CD%\logs\queens_solver.log" 2>&1
 
 echo ===== END %DATE% %TIME% ===== >> "%CD%\logs\queens_solver.log"
 
