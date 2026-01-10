@@ -7,7 +7,7 @@ Inspiration for the code:
 """
 
 import time
-from typing import List, Optional, Set, Tuple
+from typing import List, Set, Tuple
 
 
 def is_valid(
@@ -15,7 +15,7 @@ def is_valid(
     col: int,
     board: List[List[int]],
     queens: Set[Tuple[int, int]],  # (row,col) pair
-    used_cols: Set[int],  # Set so it is O(1) lookup instead of O(n) in a list
+    used_cols: Set[int],
     used_colours: Set[int],
 ) -> bool:
     """
@@ -60,61 +60,43 @@ def is_valid(
     return True  # Passed all checks
 
 
-def backtracking(
-    board: List[List[int]],  # Use colour_regions for full board from scraper
-    N: int = 0,
-    row: int = 0,
-    queens: Optional[Set[Tuple[int, int]]] = None,
-    used_cols: Optional[Set[int]] = None,
-    used_colours: Optional[Set[int]] = None,
-) -> List[Tuple[int, int]]:
+def backtracking(board: List[List[int]], N: int = 0) -> List[Tuple[int, int]]:
     """
     Function: backtracking solution
 
     Args:
         board: List of Lists of Integers between [0, N-1]
         N: int for length of board. Default is 0
-        row: int between [0, N-1]. Starts with default 0
-        queens: A set of tuples. Starts with default None (Initialises in first pass)
-        used_cols: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
-        used_colours: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
 
     Description: Solves the board using backtracking (recursive algorithm)
 
     Returns: List[Tuple(int, int)]] -> rows and columns of queen solutions
     """
+    queens: Set[Tuple[int, int]] = set()
+    used_cols: Set[int] = set()
+    used_colours: Set[int] = set()
 
-    # Initialise Sets in first pass
-    if queens is None:
-        queens = set()
-    if used_cols is None:
-        used_cols = set()
-    if used_colours is None:
-        used_colours = set()
+    def _backtrack(row: int) -> List[Tuple[int, int]]:
+        if row == N:
+            return list(queens)
 
-    if row == N:  # Only N-1 rows due to zero index
-        return list(queens)  # Final Solution!
+        for col in range(N):
+            if is_valid(row, col, board, queens, used_cols, used_colours):
+                queens.add((row, col))
+                used_cols.add(col)
+                used_colours.add(board[row][col])
 
-    for col in range(N):
-        if is_valid(row, col, board, queens, used_cols, used_colours):
-            # If it is a valid position, we add a Queen
-            queens.add((row, col))
-            used_cols.add(col)
-            used_colours.add(board[row][col])
+                result = _backtrack(row + 1)
+                if result:
+                    return result
 
-            # Continue through to the next row with a queen in that position
-            result = backtracking(board, N, row + 1, queens, used_cols, used_colours)
-            if result:
-                return result  # Found a solution further down (non empty result)
+                queens.remove((row, col))
+                used_cols.remove(col)
+                used_colours.remove(board[row][col])
 
-            # No result/solution so remove queen location
-            queens.remove((row, col))
-            used_cols.remove(col)
-            used_colours.remove(board[row][col])
+        return []
 
-            # Next pass will therefore return to original row that was looked but at the next column spot
-
-    return []  # No solution found
+    return _backtrack(0)
 
 
 if __name__ == "__main__":
@@ -129,7 +111,7 @@ if __name__ == "__main__":
         [7, 7, 7, 7, 7, 0, 0, 0],
     ]
     start = time.time()
-    backtracking(test_board)
+    backtracking(test_board, N=8)
     end = time.time()
     print(f"Backtracking Time: {end - start:4f} seconds \n")
 
