@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 set PYTHONIOENCODING=utf-8
-cd /d "C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver"
+cd /d "C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver"
 if not exist "%CD%\logs" mkdir "%CD%\logs"
 
 echo ===== START %DATE% %TIME% ===== >> "%CD%\logs\score_sharer.log"

@@ -142,7 +142,7 @@ def get_fun_fact(df):
 
 # Path to the plot image
 image_path = (
-    r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\queens_scores_plot.png"
+    r"C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver\queens_scores_plot.png"
 )
 
 
@@ -184,7 +184,7 @@ def upload_plot(driver):
     time.sleep(0.2)
 
     df = pd.read_csv(
-        r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv"
+        r"C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver\Queens\scores.csv"
     )
     fun_fact = get_fun_fact(df)
 
@@ -207,7 +207,7 @@ def upload_plot(driver):
 
 if __name__ == "__main__":
     df = pd.read_csv(
-        r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv"
+        r"C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver\Queens\scores.csv"
     )
     test = get_fun_fact(df)
     print(test)
