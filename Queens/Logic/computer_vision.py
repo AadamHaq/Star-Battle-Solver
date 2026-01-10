@@ -67,12 +67,32 @@ from Logic.game_scraper import initialise_driver
 def get_image(driver,path):
 
     driver.get("https://www.linkedin.com/games/queens") 
+    driver.execute_script("document.body.style.zoom='100%'")
+    time.sleep(1)
 
     board = driver.find_element(By.ID, "queens-grid")
 
     board.screenshot(path)
     print("Screenshot obtained")
 
+def sample_patch(img, x, y, r=4):
+    """
+    Sample a small square patch around (x, y) and return mean colour.
+    """
+    h, w, _ = img.shape
+    x1, x2 = max(0, x - r), min(w, x + r)
+    y1, y2 = max(0, y - r), min(h, y + r)
+    patch = img[y1:y2, x1:x2]
+    return np.mean(patch.reshape(-1, 3), axis=0)
+
+def find_colour_id(colour, colour_map, tol=15):
+    """
+    Find an existing colour within tolerance, otherwise return None.
+    """
+    for cid, ref in colour_map.items():
+        if np.linalg.norm(colour - ref) < tol:
+            return cid
+    return None
 
 def computer_vision(path):
     # Load image and resize to standardise
@@ -122,20 +142,29 @@ def computer_vision(path):
     board = [[-1 for _ in range(num_cols)] for _ in range(num_rows)]
 
     # Assign colour IDs based on center of each cell
-    unique_colours = {}
+    unique_colours = {}   # colour_id -> mean colour
     colour_index = 0
 
     for i in range(size):
         for j in range(size):
-            y = (rows[i] + rows[i+1]) // 2 # Centre of height of cell
-            x = (cols[j] + cols[j+1]) // 2 # Centre of width of cell
-            colour = tuple(resized[y, x])
+            y = (rows[i] + rows[i+1]) // 2
+            x = (cols[j] + cols[j+1]) // 2
 
-            if colour not in unique_colours:
-                unique_colours[colour] = colour_index
+            colour = sample_patch(resized, x, y)
+
+            cid = find_colour_id(colour, unique_colours)
+            if cid is None:
+                cid = colour_index
+                unique_colours[cid] = colour
                 colour_index += 1
 
-            board[i][j] = unique_colours[colour]
+            board[i][j] = cid
+
+    unique_regions = len(set(v for row in board for v in row))
+    if unique_regions != size:
+        raise ValueError(
+            f"CV failed: expected {size} regions, got {unique_regions}"
+        )
 
     return board
 

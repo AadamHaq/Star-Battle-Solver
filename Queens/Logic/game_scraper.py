@@ -41,6 +41,11 @@ def initialise_driver(cookie_file):
     Description: Initialises the driver, launches LinkedIn and loads the cookies
     """
     chrome_options = Options()
+    chrome_options.add_argument("--force-device-scale-factor=1")
+    chrome_options.add_argument("--high-dpi-support=1")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-font-subpixel-positioning")
+    chrome_options.add_argument("--disable-lcd-text")
     if os.environ.get('SESSIONNAME') != 'Console':
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--window-size=1920,1080")
@@ -82,6 +87,8 @@ def scraper(driver):
     """
 
     driver.get("https://www.linkedin.com/games/queens") 
+    driver.execute_script("document.body.style.zoom='100%'")
+    time.sleep(1)
 
     board = driver.find_element(By.ID, "queens-grid")
 
