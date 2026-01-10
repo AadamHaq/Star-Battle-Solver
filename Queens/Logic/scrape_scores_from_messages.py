@@ -1,10 +1,15 @@
+import re
+import time
+
+from bs4 import BeautifulSoup
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    StaleElementReferenceException,
+)
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
-from bs4 import BeautifulSoup
-import time
-import re
+
 
 def scroll_chat(driver, key_presses=132, pause=0.03):
     """
@@ -19,7 +24,9 @@ def scroll_chat(driver, key_presses=132, pause=0.03):
     """
     for attempt in range(3):  # Multiple attempts as it sometimes doesn't work
         try:
-            bubbles = driver.find_elements(By.CSS_SELECTOR, ".msg-s-event-listitem__message-bubble")  # Find the inside of the chatbox
+            bubbles = driver.find_elements(
+                By.CSS_SELECTOR, ".msg-s-event-listitem__message-bubble"
+            )  # Find the inside of the chatbox
             if not bubbles:
                 print("No message bubbles found to scroll.")
                 time.sleep(1)
@@ -29,7 +36,9 @@ def scroll_chat(driver, key_presses=132, pause=0.03):
             time.sleep(0.3)
 
             offset_x, offset_y = 100, 10
-            ActionChains(driver).move_to_element_with_offset(target, offset_x, offset_y).click().perform()
+            ActionChains(driver).move_to_element_with_offset(
+                target, offset_x, offset_y
+            ).click().perform()
             time.sleep(0.3)
 
             for i in range(1, key_presses + 1):
@@ -43,11 +52,13 @@ def scroll_chat(driver, key_presses=132, pause=0.03):
                     target.send_keys(Keys.ARROW_DOWN)
                     time.sleep(pause)
 
-            print(f"Scrolled chat by sending {key_presses} UP arrow keys with 2 DOWN arrows every 33 presses.")
+            print(
+                f"Scrolled chat by sending {key_presses} UP arrow keys with 2 DOWN arrows every 33 presses."
+            )
             return True
 
         except (StaleElementReferenceException, NoSuchElementException):
-            print(f"Attempt {attempt+1}: Encountered stale element, retrying...")
+            print(f"Attempt {attempt + 1}: Encountered stale element, retrying...")
             time.sleep(1)
     print("Failed to scroll chat by keys after retries.")
     return False
@@ -63,7 +74,9 @@ def get_chat_html(driver):
     Description: Finds the messages list. Created as a seperate function for debugging.
     """
     # First path should work but second is a fallback when scrolling to the top of the container
-    xpath_primary = "//div[contains(@class,'msg-s-message-list') and contains(@class,'scrollable')]"
+    xpath_primary = (
+        "//div[contains(@class,'msg-s-message-list') and contains(@class,'scrollable')]"
+    )
     xpath_fallback = "//div[contains(@class,'msg-s-message-list-content') and contains(@class,'list-style-none')]"
 
     for xpath in [xpath_primary, xpath_fallback]:
@@ -73,6 +86,7 @@ def get_chat_html(driver):
         except NoSuchElementException:
             continue
     raise RuntimeError("Chat container not found")
+
 
 def scrape_messages_bs4(driver):
     """
@@ -92,7 +106,9 @@ def scrape_messages_bs4(driver):
     # Get html messages
     html = get_chat_html(driver)
     soup = BeautifulSoup(html, "html.parser")
-    lis = soup.select("li.msg-s-message-list__event") # Messages are all stored in their own <li>
+    lis = soup.select(
+        "li.msg-s-message-list__event"
+    )  # Messages are all stored in their own <li>
 
     # Find 'Today' divider as we are only looking at scores Today
     start = 0
@@ -104,23 +120,26 @@ def scrape_messages_bs4(driver):
 
     # Now we have 'Today' we can find all messages underneath
     results = []
-    current_sender = "Unknown" # Store sender seperate and track as sender isn't necessarily in the same <li> as the message
+    current_sender = "Unknown"  # Store sender seperate and track as sender isn't necessarily in the same <li> as the message
     for li in lis[start:]:
         meta = li.select_one(".msg-s-message-group__meta")
         if meta:
-            nm = meta.select_one(".msg-s-message-group__name") # Name
+            nm = meta.select_one(".msg-s-message-group__name")  # Name
             if nm and nm.get_text(strip=True):
                 current_sender = nm.get_text(strip=True)
 
-        bubble = li.select_one(".msg-s-event-listitem__body") # Message
+        bubble = li.select_one(".msg-s-event-listitem__body")  # Message
         if not bubble:
             continue
-        text = bubble.get_text("\n", strip=True) # Strip blank space
-        first = next((line for line in text.splitlines() if line.strip()), "") # Strip new lines
-        if re.match(r"^Queens #(\d{3})(?!\d)\b", first): # Find Queens message
-            results.append((current_sender, text)) # Append
+        text = bubble.get_text("\n", strip=True)  # Strip blank space
+        first = next(
+            (line for line in text.splitlines() if line.strip()), ""
+        )  # Strip new lines
+        if re.match(r"^Queens #(\d{3})(?!\d)\b", first):  # Find Queens message
+            results.append((current_sender, text))  # Append
 
     return results
+
 
 def score_scraper(driver, name):
     """
@@ -145,21 +164,28 @@ def score_scraper(driver, name):
 
     time.sleep(1)
 
-    messaging_icon = driver.find_element(By.XPATH, "//li-icon[@type='nav-small-messaging-icon']") # Click messaging button
+    messaging_icon = driver.find_element(
+        By.XPATH, "//li-icon[@type='nav-small-messaging-icon']"
+    )  # Click messaging button
     messaging_icon.click()
 
     time.sleep(3)
 
-    search_bar = driver.find_element(By.ID, "search-conversations") # Enter conversation name
+    search_bar = driver.find_element(
+        By.ID, "search-conversations"
+    )  # Enter conversation name
     search_bar.send_keys(name + Keys.ENTER)
 
     try:
         time.sleep(2)
-        conversation = driver.find_element(By.XPATH, f"//span[text()='{name}']/ancestor::div[contains(@class, 'msg-conversation-card__content--selectable')]")
-        conversation.click() # Click conversation
+        conversation = driver.find_element(
+            By.XPATH,
+            f"//span[text()='{name}']/ancestor::div[contains(@class, 'msg-conversation-card__content--selectable')]",
+        )
+        conversation.click()  # Click conversation
 
         time.sleep(2)
-        results = scrape_messages_bs4(driver) # Scrape
+        results = scrape_messages_bs4(driver)  # Scrape
         return results
     except Exception as e:
         print(f"Could not find button for {name}: {e}")

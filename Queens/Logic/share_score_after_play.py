@@ -1,8 +1,10 @@
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException
 import time
+
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+
 
 def share_score(driver, name):
     """
@@ -18,8 +20,7 @@ def share_score(driver, name):
 
     try:
         skip_btn = driver.find_element(
-            By.XPATH,
-            "//div[@role='dialog']//button[.//span[normalize-space()='Skip']]"
+            By.XPATH, "//div[@role='dialog']//button[.//span[normalize-space()='Skip']]"
         )
         skip_btn.click()
         print("✅ Bonus popup closed")
@@ -40,8 +41,8 @@ def share_score(driver, name):
 
     print("Clicking share button")
     send_button = driver.find_element(
-    By.XPATH,
-    "//span[normalize-space()='Send']/preceding-sibling::button" # Used 'Send' text instead of button due to errors
+        By.XPATH,
+        "//span[normalize-space()='Send']/preceding-sibling::button",  # Used 'Send' text instead of button due to errors
     )
     send_button.click()
 
@@ -51,12 +52,14 @@ def share_score(driver, name):
         send_to = driver.find_element(
             By.XPATH,
             f"//div[@class='msg-connections-typeahead__entity-description']"
-            f"[.//dt[contains(normalize-space(), '{name}')]]" # Name of person to send to and click
-            "/ancestor::button"
+            f"[.//dt[contains(normalize-space(), '{name}')]]"  # Name of person to send to and click
+            "/ancestor::button",
         )
         send_to.click()
-    except:
-        input_box = driver.find_element(By.XPATH, "//input[@placeholder='Type a name']") # Type group chat name
+    except Exception:
+        input_box = driver.find_element(
+            By.XPATH, "//input[@placeholder='Type a name']"
+        )  # Type group chat name
         input_box.send_keys(name + Keys.ENTER)
 
         time.sleep(1)
@@ -66,14 +69,14 @@ def share_score(driver, name):
             f"//div[@class='msg-connections-typeahead__entity-description']"
             f"[.//dt[contains(normalize-space(), '{name}')]]"
             "/ancestor::div[contains(@class, 'msg-connections-typeahead__search-result-row')]"
-            "//label[contains(@class, 'msg-connections-typeahead__checkbox-multisend')]"
+            "//label[contains(@class, 'msg-connections-typeahead__checkbox-multisend')]",
         )
         send_to.click()
     try:
         time.sleep(0.5)
         textbox = driver.find_element(
             By.XPATH,
-            "//div[contains(@class, 'msg-form__contenteditable') and @contenteditable='true']" # Text box for message
+            "//div[contains(@class, 'msg-form__contenteditable') and @contenteditable='true']",  # Text box for message
         )
         textbox.click()
 
@@ -84,5 +87,5 @@ def share_score(driver, name):
         print("Tab + Enter sent successfully.")
         time.sleep(2)
 
-    except:
+    except Exception:
         print("Could not find user to send to")

@@ -15,3 +15,16 @@ dependencies = [
     "webdriver-manager>=4.0.2",
     "z3>=0.2.0",
 ]
+
+[dependency-groups]
+dev = [
+    "isort>=7.0.0",
+    "pre-commit>=4.5.1",
+    "ruff>=0.14.11",
+    "ty>=0.0.11",
+]
+
+[tool.ty.src]
+# Check everything under Queens except linear_programming.py -> z3 types fail
+exclude = ["Queens/Logic/Solvers/linear_programming.py"]
+

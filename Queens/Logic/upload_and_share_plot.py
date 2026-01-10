@@ -1,14 +1,16 @@
+import os
+import random
+import time
+
+import numpy as np
+import pandas as pd
+from dotenv import load_dotenv
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
-import time
-import pandas as pd
-import random
-import numpy as np
-import os
-from dotenv import load_dotenv
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 def time_to_seconds(t):
     """Convert mm:ss string to seconds (or NaN if missing)."""
@@ -17,7 +19,7 @@ def time_to_seconds(t):
     try:
         mins, secs = t.split(":")
         return int(mins) * 60 + int(secs)
-    except:
+    except Exception:
         return np.nan
 
 
@@ -50,7 +52,9 @@ def get_fun_fact(df):
         fastest_player = today_valid.idxmin()
         fastest_time = today_valid.min()
         name = alias_map.get(fastest_player, fastest_player)
-        fun_facts.append(f"🏆 Fastest today: {name} with {int(fastest_time//60)}:{int(fastest_time%60):02d}")
+        fun_facts.append(
+            f"🏆 Fastest today: {name} with {int(fastest_time // 60)}:{int(fastest_time % 60):02d}"
+        )
 
     # --- Bad day check (> 5:00) ---
     if not today_valid.empty:
@@ -65,7 +69,7 @@ def get_fun_fact(df):
             # Use the maximum time among the bad players for display
             max_secs = bad_day.max()
             fun_facts.append(
-                f"😬 {name_str} had a bad day with a time of up to {int(max_secs//60)}:{int(max_secs%60):02d}... maybe Haris played on their phone"
+                f"😬 {name_str} had a bad day with a time of up to {int(max_secs // 60)}:{int(max_secs % 60):02d}... maybe Haris played on their phone"
             )
 
     # # --- Most improved (today vs average of last 14 days) ---
@@ -109,10 +113,12 @@ def get_fun_fact(df):
         current_streaks[p] = streak
 
     # Find player with the current longest win streak
-    best_player = max(current_streaks, key=current_streaks.get)
+    best_player = max(current_streaks, key=lambda k: current_streaks[k])
     if current_streaks[best_player] > 1:  # only count streaks > 1
         name = alias_map.get(best_player, best_player)
-        fun_facts.append(f"🔥 {name} is on a {current_streaks[best_player]}-day win streak!")
+        fun_facts.append(
+            f"🔥 {name} is on a {current_streaks[best_player]}-day win streak!"
+        )
 
     # --- Big drop check (yesterday 1st → today last) ---
     if len(df_secs) >= 2:
@@ -122,7 +128,9 @@ def get_fun_fact(df):
             today_loser = today_valid.idxmax()
             if yesterday_winner == today_loser:
                 name = alias_map.get(yesterday_winner, yesterday_winner)
-                fun_facts.append(f"⬇️ {name} went from 1st to last overnight... someone had a bad sleep!")
+                fun_facts.append(
+                    f"⬇️ {name} went from 1st to last overnight... someone had a bad sleep!"
+                )
 
     # --- Pick one fact to show ---
     if fun_facts:
@@ -133,25 +141,35 @@ def get_fun_fact(df):
 
 
 # Path to the plot image
-image_path = r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\queens_scores_plot.png"
+image_path = (
+    r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\queens_scores_plot.png"
+)
+
+
 def upload_plot(driver):
     # 1. Find the image-specific input (accepts image/*)
-    upload_input = driver.find_element(By.XPATH, "//input[@type='file' and contains(@accept, 'image')]")
+    upload_input = driver.find_element(
+        By.XPATH, "//input[@type='file' and contains(@accept, 'image')]"
+    )
 
     # 2. Upload the file
     upload_input.send_keys(image_path)
     print("📤 Image file sent to upload input.")
-    
+
     try:
         # Option A: check for generic file preview (not just images)
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'msg-attachment-preview')]"))
+            EC.presence_of_element_located(
+                (By.XPATH, "//div[contains(@class, 'msg-attachment-preview')]")
+            )
         )
         print("Option A")
-    except:
+    except Exception:
         # Option B: wait for a "Send" button to become active again
         WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'msg-form__send-button')]"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//button[contains(@class, 'msg-form__send-button')]")
+            )
         )
         print("Option B")
     print("🖼️ Image preview appeared in chat.")
@@ -160,12 +178,14 @@ def upload_plot(driver):
 
     textbox = driver.find_element(
         By.XPATH,
-        "//div[contains(@class, 'msg-form__contenteditable') and @contenteditable='true']"
+        "//div[contains(@class, 'msg-form__contenteditable') and @contenteditable='true']",
     )
     textbox.click()
     time.sleep(0.2)
 
-    df = pd.read_csv(r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv")
+    df = pd.read_csv(
+        r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv"
+    )
     fun_fact = get_fun_fact(df)
 
     actions = ActionChains(driver)
@@ -184,7 +204,10 @@ def upload_plot(driver):
     print("✅ Image sent via Tab + Enter.")
     time.sleep(5)
 
+
 if __name__ == "__main__":
-    df = pd.read_csv(r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv")
+    df = pd.read_csv(
+        r"C:\Users\user\OneDrive\Documents\GitHub\Star-Battle-Solver\Queens\scores.csv"
+    )
     test = get_fun_fact(df)
     print(test)

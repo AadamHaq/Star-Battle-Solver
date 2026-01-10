@@ -36,9 +36,11 @@ Example board:
             x_pq + x_{p+1}{q-1} <= 1
             x_pq + x_{p-1}{q-1} <= 1
 """
-from z3 import Bool, Solver, Sum, If, Or, Not, sat
-from pulp import LpProblem, LpVariable, lpSum, LpMinimize, LpBinary, LpStatus
+
 import time
+
+from pulp import LpBinary, LpMinimize, LpProblem, LpStatus, LpVariable, lpSum
+from z3 import Bool, If, Not, Or, Solver, Sum, sat
 
 
 def solve_queens_puzzle_z3(board):
@@ -50,17 +52,21 @@ def solve_queens_puzzle_z3(board):
 
     # 1. One queen per row
     for i in range(n):
-        solver.add(Sum([If(Q[i][j], 1, 0) for j in range(n)]) == 1) # Sum of row == 1
+        solver.add(Sum([If(Q[i][j], 1, 0) for j in range(n)]) == 1)  # Sum of row == 1
 
     # 2. One queen per column
     for j in range(n):
-        solver.add(Sum([If(Q[i][j], 1, 0) for i in range(n)]) == 1) # Sum of col == 1
+        solver.add(Sum([If(Q[i][j], 1, 0) for i in range(n)]) == 1)  # Sum of col == 1
 
     # 3. One queen per region
     region_ids = set(i for i in range(n))
     for region in region_ids:
-        region_cells = [(i, j) for i in range(n) for j in range(n) if board[i][j] == region] # All cells in one region
-        solver.add(Sum([If(Q[i][j], 1, 0) for (i, j) in region_cells]) == 1) # Must sum to 1
+        region_cells = [
+            (i, j) for i in range(n) for j in range(n) if board[i][j] == region
+        ]  # All cells in one region
+        solver.add(
+            Sum([If(Q[i][j], 1, 0) for (i, j) in region_cells]) == 1
+        )  # Must sum to 1
 
     # 4. No adjacent queens (8-neighbors)
     for i in range(n):
@@ -69,16 +75,20 @@ def solve_queens_puzzle_z3(board):
                 (i + dx, j + dy)
                 for dx in [-1, 0, 1]
                 for dy in [-1, 0, 1]
-                if not (dx == 0 and dy == 0) # Not itself
+                if not (dx == 0 and dy == 0)  # Not itself
             ]
             for ni, nj in neighbors:
                 if 0 <= ni < n and 0 <= nj < n:
-                    solver.add(Or(Not(Q[i][j]), Not(Q[ni][nj]))) # Only up to one can be a queen
+                    solver.add(
+                        Or(Not(Q[i][j]), Not(Q[ni][nj]))
+                    )  # Only up to one can be a queen
 
     # Solve
-    if solver.check() == sat: # If there is a solution (There always should be)
+    if solver.check() == sat:  # If there is a solution (There always should be)
         model = solver.model()
-        solution = [[1 if model.evaluate(Q[i][j]) else 0 for j in range(n)] for i in range(n)] # 1 where Queen is true
+        solution = [
+            [1 if model.evaluate(Q[i][j]) else 0 for j in range(n)] for i in range(n)
+        ]  # 1 where Queen is true
         print("Solution found:")
         for row in solution:
             print(" ".join(str(cell) for cell in row))
@@ -90,7 +100,9 @@ def solve_queens_puzzle_z3(board):
 
 def solve_queens_puzzle_pulp(board):
     n = len(board)
-    model = LpProblem("Queens", LpMinimize) # Minimise Integer Linear Programming Problem
+    model = LpProblem(
+        "Queens", LpMinimize
+    )  # Minimise Integer Linear Programming Problem
 
     # Variables: x[i][j] = 1 if there's a queen at (i, j), 0 otherwise
     x = [[LpVariable(f"x_{i}_{j}", cat=LpBinary) for j in range(n)] for i in range(n)]
@@ -100,33 +112,38 @@ def solve_queens_puzzle_pulp(board):
 
     # 1. One queen per row
     for i in range(n):
-        model += lpSum(x[i][j] for j in range(n)) == 1 # Similar to Z3
+        model += lpSum(x[i][j] for j in range(n)) == 1  # Similar to Z3
 
     # 2. One queen per column
     for j in range(n):
-        model += lpSum(x[i][j] for i in range(n)) == 1 # Similar to Z3
+        model += lpSum(x[i][j] for i in range(n)) == 1  # Similar to Z3
 
     # 3. One queen per region
     region_ids = set(i for i in range(n))
     for region in region_ids:
-        model += lpSum(x[i][j] for i in range(n) for j in range(n) if board[i][j] == region) == 1 # Similar to Z3
+        model += (
+            lpSum(x[i][j] for i in range(n) for j in range(n) if board[i][j] == region)
+            == 1
+        )  # Similar to Z3
 
     # 4. No adjacent queens
-    directions = [(-1, -1), (-1, 0), (-1, 1),
-                  ( 0, -1),          ( 0, 1),
-                  ( 1, -1), ( 1, 0), ( 1, 1)]
-    
+    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
     for i in range(n):
         for j in range(n):
             for dx, dy in directions:
                 ni, nj = i + dx, j + dy
                 if 0 <= ni < n and 0 <= nj < n:
-                    model += x[i][j] + x[ni][nj] <= 1 # Cell + Neighbour has at most 1 Queen
+                    model += (
+                        x[i][j] + x[ni][nj] <= 1
+                    )  # Cell + Neighbour has at most 1 Queen
 
     # Solve
     status = model.solve()
     if LpStatus[status] == "Optimal":
-        solution = [[int(x[i][j].varValue) for j in range(n)] for i in range(n)] # varValue so it's an int (not as 1.0)
+        solution = [
+            [int(x[i][j].varValue) for j in range(n)] for i in range(n)
+        ]  # varValue so it's an int (not as 1.0)
         print("Solution found:")
         for row in solution:
             print(" ".join(str(cell) for cell in row))
@@ -135,16 +152,17 @@ def solve_queens_puzzle_pulp(board):
         print("No solution found.")
         return None
 
+
 if __name__ == "__main__":
     test_board = [
-    [0, 1, 1, 2, 3, 3, 3, 4],
-    [0, 0, 1, 2, 2, 3, 3, 4],
-    [5, 0, 0, 0, 0, 3, 3, 4],
-    [5, 5, 0, 0, 0, 0, 3, 4],
-    [6, 6, 0, 0, 0, 0, 3, 0],
-    [7, 6, 0, 0, 0, 0, 0, 0],
-    [7, 7, 7, 0, 0, 0, 0, 0],
-    [7, 7, 7, 7, 7, 0, 0, 0],
+        [0, 1, 1, 2, 3, 3, 3, 4],
+        [0, 0, 1, 2, 2, 3, 3, 4],
+        [5, 0, 0, 0, 0, 3, 3, 4],
+        [5, 5, 0, 0, 0, 0, 3, 4],
+        [6, 6, 0, 0, 0, 0, 3, 0],
+        [7, 6, 0, 0, 0, 0, 0, 0],
+        [7, 7, 7, 0, 0, 0, 0, 0],
+        [7, 7, 7, 7, 7, 0, 0, 0],
     ]
     start = time.time()
     solve_queens_puzzle_z3(test_board)
@@ -157,5 +175,3 @@ if __name__ == "__main__":
     print(f"PuLP Time: {end - start:.4f} seconds \n")
 
     # Verdict: Z3 was marginally faster so we will go with that
-
-

@@ -57,16 +57,17 @@ Output:
 [4, 4, 4, 4, 4, 4, 4]]
 """
 
-import cv2 as cv
-import numpy as np
-from selenium.webdriver.common.by import By
 import os
 import time
+
+import cv2 as cv
+import numpy as np
 from Logic.game_scraper import initialise_driver
+from selenium.webdriver.common.by import By
 
-def get_image(driver,path):
 
-    driver.get("https://www.linkedin.com/games/queens") 
+def get_image(driver, path):
+    driver.get("https://www.linkedin.com/games/queens")
     driver.execute_script("document.body.style.zoom='100%'")
     time.sleep(1)
 
@@ -74,6 +75,7 @@ def get_image(driver,path):
 
     board.screenshot(path)
     print("Screenshot obtained")
+
 
 def sample_patch(img, x, y, r=4):
     """
@@ -85,6 +87,7 @@ def sample_patch(img, x, y, r=4):
     patch = img[y1:y2, x1:x2]
     return np.mean(patch.reshape(-1, 3), axis=0)
 
+
 def find_colour_id(colour, colour_map, tol=15):
     """
     Find an existing colour within tolerance, otherwise return None.
@@ -94,18 +97,23 @@ def find_colour_id(colour, colour_map, tol=15):
             return cid
     return None
 
+
 def computer_vision(path):
     # Load image and resize to standardise
     image = cv.imread(path)
+    if image is None:
+        raise FileNotFoundError(f"Image not found at path: {path}")
     resized = cv.resize(image, (350, 350))
 
     # Convert to grayscale and edge detection
     gray = cv.cvtColor(resized, cv.COLOR_BGR2GRAY)
-    edges = cv.Canny(gray, 50, 150, apertureSize=3) # Uses Canny algorithm
+    edges = cv.Canny(gray, 50, 150, apertureSize=3)  # Uses Canny algorithm
 
     # Use Hough Transform to detect straight lines in the image
     # Converts edge points from Canny alg. into votes and if a certain line gets many votes, it is a line
-    lines = cv.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=50, maxLineGap=10)
+    lines = cv.HoughLinesP(
+        edges, 1, np.pi / 180, threshold=100, minLineLength=50, maxLineGap=10
+    )
 
     # Separate vertical and horizontal lines
     horizontal_lines = []
@@ -120,11 +128,11 @@ def computer_vision(path):
 
     # Cluster close lines as some lines may be repeated
     def cluster_lines(lines, threshold=10):
-        lines = sorted(set(lines)) # Removes duplicates and sorts
+        lines = sorted(set(lines))  # Removes duplicates and sorts
         clustered = []
-        for l in lines:
-            if not clustered or abs(l - clustered[-1]) > threshold:
-                clustered.append(l)
+        for line in lines:
+            if not clustered or abs(line - clustered[-1]) > threshold:
+                clustered.append(line)
         return clustered
 
     cols = cluster_lines(vertical_lines)
@@ -134,21 +142,23 @@ def computer_vision(path):
     num_cols = len(cols) - 1
 
     if num_rows != num_cols:
-        raise ValueError(f"Detected board is not square: {num_rows} rows, {num_cols} cols")
-    
+        raise ValueError(
+            f"Detected board is not square: {num_rows} rows, {num_cols} cols"
+        )
+
     size = num_rows
 
     # Initialize board with -1
     board = [[-1 for _ in range(num_cols)] for _ in range(num_rows)]
 
     # Assign colour IDs based on center of each cell
-    unique_colours = {}   # colour_id -> mean colour
+    unique_colours = {}  # colour_id -> mean colour
     colour_index = 0
 
     for i in range(size):
         for j in range(size):
-            y = (rows[i] + rows[i+1]) // 2
-            x = (cols[j] + cols[j+1]) // 2
+            y = (rows[i] + rows[i + 1]) // 2
+            x = (cols[j] + cols[j + 1]) // 2
 
             colour = sample_patch(resized, x, y)
 
@@ -162,16 +172,13 @@ def computer_vision(path):
 
     unique_regions = len(set(v for row in board for v in row))
     if unique_regions != size:
-        raise ValueError(
-            f"CV failed: expected {size} regions, got {unique_regions}"
-        )
+        raise ValueError(f"CV failed: expected {size} regions, got {unique_regions}")
 
     return board
 
 
 if __name__ == "__main__":
     # Creating training data for RL
-
 
     cookie_file = "linkedin_cookies.pkl"
     driver = initialise_driver(cookie_file)
@@ -184,7 +191,7 @@ if __name__ == "__main__":
     os.makedirs(txt_save, exist_ok=True)
 
     for i in range(1, 387):
-        if i in [4,7,9,13,14,18,19,20]:
+        if i in [4, 7, 9, 13, 14, 18, 19, 20]:
             print("Skipped")
             continue
         img_path = os.path.join(img_save, f"queens_board_{i}.png")

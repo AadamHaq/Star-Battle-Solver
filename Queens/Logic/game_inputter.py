@@ -1,9 +1,11 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-import time
 import re
+import time
 
-# Only need to input as it is assumed we are still on the page from the scraper 
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+
+# Only need to input as it is assumed we are still on the page from the scraper
+
 
 def input_solution(driver, solution):
     """
@@ -12,7 +14,7 @@ def input_solution(driver, solution):
     Args:
         driver: Selenium driver that was initialised
         solution: List[Tuple(int, int)] rows and columns of the queens in the solution. SOLUTION MUST BE 1-INDEXED DUE TO LINKEDIN
-    
+
     Description: Completes the board!
 
     Returns: None

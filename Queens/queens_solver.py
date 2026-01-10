@@ -1,9 +1,11 @@
-from Logic.game_scraper import initialise_driver, scraper
-from Logic.Solvers.naive_backtracking import backtracking
-from Logic.game_inputter import input_solution
-from Logic.share_score_after_play import share_score
-from Logic.computer_vision import get_image, computer_vision
 import time
+
+from Logic.computer_vision import computer_vision, get_image
+from Logic.game_inputter import input_solution
+from Logic.game_scraper import initialise_driver, scraper
+from Logic.share_score_after_play import share_score
+from Logic.Solvers.naive_backtracking import backtracking
+
 
 def main(cookie_file, name):
     """
@@ -12,7 +14,7 @@ def main(cookie_file, name):
     Args:
         cookie_file: .pkl file that can be retrieved by running get_cookies.py
         name: Name of group chat that the score will be sent to
-    
+
     Description: Runs all other functions into one seamless solution then quits the driver
 
     Returns: None
@@ -27,11 +29,11 @@ def main(cookie_file, name):
         N = len(board)
         print(board)
 
-    except:
+    except Exception:
         data = scraper(driver)
 
-        board = data['board']
-        N = data['board_size']
+        board = data["board"]
+        N = data["board_size"]
         print(board)
     solution = backtracking(board, N)
 
@@ -43,6 +45,7 @@ def main(cookie_file, name):
     share_score(driver, name)
 
     driver.quit()
+
 
 if __name__ == "__main__":
     COOKIE_FILE = "linkedin_cookies.pkl"

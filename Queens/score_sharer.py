@@ -1,7 +1,8 @@
 from Logic.game_scraper import initialise_driver
+from Logic.plot_scores import plot_graph, write_csv
 from Logic.scrape_scores_from_messages import score_scraper
-from Logic.plot_scores import write_csv, plot_graph
 from Logic.upload_and_share_plot import upload_plot
+
 
 def main(cookie_file, name):
     driver = initialise_driver(cookie_file)
@@ -12,7 +13,6 @@ def main(cookie_file, name):
     upload_plot(driver)
 
     driver.quit()
-
 
 
 if __name__ == "__main__":

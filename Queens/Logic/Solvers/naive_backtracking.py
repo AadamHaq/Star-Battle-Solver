@@ -1,21 +1,22 @@
 """
-Inspiration for the code: 
+Inspiration for the code:
 - N-Queens Solution (famous backtracking problem) Leetcode 51
     - Used https://www.youtube.com/watch?v=Ph95IHmRp5M solution from Neetcode
     - https://www.geeksforgeeks.org/python-program-for-n-queen-problem-backtracking-3/
 - https://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2019-2020/Makalah/stima2020k2-035.pdf
 """
 
-from typing import List, Set, Tuple
 import time
+from typing import List, Optional, Set, Tuple
+
 
 def is_valid(
     row: int,
     col: int,
     board: List[List[int]],
-    queens: Set[Tuple[int, int]], # (row,col) pair
-    used_cols: Set[int], # Set so it is O(1) lookup instead of O(n) in a list
-    used_colours: Set[int]
+    queens: Set[Tuple[int, int]],  # (row,col) pair
+    used_cols: Set[int],  # Set so it is O(1) lookup instead of O(n) in a list
+    used_colours: Set[int],
 ) -> bool:
     """
     Function: is_valid sees if a Queen can be placed
@@ -27,12 +28,12 @@ def is_valid(
         queens: A set of tuples
         used_cols: A set of integers that are between [0, N-1]
         used_colours: A set of integers that are between [0, N-1]
-    
+
     Description: Checks to see if it is valid to make a move. It checks:
         - If a column already has a Queen
         - If a coloured colour already has a Queen
         - If there are any Queens in it's 3x3 area
-    
+
     N.B: We don't check row as rows are done sequentially and when a Queen is placed, we move to the next row
 
     Returns: Boolean -> True if can place a queen
@@ -48,26 +49,25 @@ def is_valid(
         return False
 
     # Check 3x3 neighborhood (adjacent cells)
-    for adj_row in (-1, 0, 1): # Next row used to look at top right cell
+    for adj_row in (-1, 0, 1):  # Next row used to look at top right cell
         for adj_col in (-1, 0, 1):
             if adj_row == 0 and adj_col == 0:
-                continue # Skip looking at current position
+                continue  # Skip looking at current position
             neighbour_row, neighbour_col = row + adj_row, col + adj_col
             if (neighbour_row, neighbour_col) in queens:
-                return False # False if there is a neighbouring queen
+                return False  # False if there is a neighbouring queen
 
-    return True # Passed all checks
+    return True  # Passed all checks
 
 
 def backtracking(
-    board: List[List[int]], # Use colour_regions for full board from scraper
+    board: List[List[int]],  # Use colour_regions for full board from scraper
     N: int = 0,
     row: int = 0,
-    queens: Set[Tuple[int, int]] = None,
-    used_cols: Set[int] = None,
-    used_colours: Set[int] = None
+    queens: Optional[Set[Tuple[int, int]]] = None,
+    used_cols: Optional[Set[int]] = None,
+    used_colours: Optional[Set[int]] = None,
 ) -> List[Tuple[int, int]]:
-
     """
     Function: backtracking solution
 
@@ -78,21 +78,21 @@ def backtracking(
         queens: A set of tuples. Starts with default None (Initialises in first pass)
         used_cols: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
         used_colours: A set of integers that are between [0, N-1]. Starts with default None (Initialises in first pass)
-    
+
     Description: Solves the board using backtracking (recursive algorithm)
-    
+
     Returns: List[Tuple(int, int)]] -> rows and columns of queen solutions
     """
 
     # Initialise Sets in first pass
     if queens is None:
-        queens = set() 
+        queens = set()
     if used_cols is None:
         used_cols = set()
     if used_colours is None:
         used_colours = set()
 
-    if row == N: # Only N-1 rows due to zero index
+    if row == N:  # Only N-1 rows due to zero index
         return list(queens)  # Final Solution!
 
     for col in range(N):
@@ -119,14 +119,14 @@ def backtracking(
 
 if __name__ == "__main__":
     test_board = [
-    [0, 1, 1, 2, 3, 3, 3, 4],
-    [0, 0, 1, 2, 2, 3, 3, 4],
-    [5, 0, 0, 0, 0, 3, 3, 4],
-    [5, 5, 0, 0, 0, 0, 3, 4],
-    [6, 6, 0, 0, 0, 0, 3, 0],
-    [7, 6, 0, 0, 0, 0, 0, 0],
-    [7, 7, 7, 0, 0, 0, 0, 0],
-    [7, 7, 7, 7, 7, 0, 0, 0],
+        [0, 1, 1, 2, 3, 3, 3, 4],
+        [0, 0, 1, 2, 2, 3, 3, 4],
+        [5, 0, 0, 0, 0, 3, 3, 4],
+        [5, 5, 0, 0, 0, 0, 3, 4],
+        [6, 6, 0, 0, 0, 0, 3, 0],
+        [7, 6, 0, 0, 0, 0, 0, 0],
+        [7, 7, 7, 0, 0, 0, 0, 0],
+        [7, 7, 7, 7, 7, 0, 0, 0],
     ]
     start = time.time()
     backtracking(test_board)
@@ -135,4 +135,3 @@ if __name__ == "__main__":
 
     # Instant - 0.00000s
     # Better than Linear Programming currently
-

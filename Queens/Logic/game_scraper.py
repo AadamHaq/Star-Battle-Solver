@@ -1,14 +1,18 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+import os
+import pickle
 import re
 import time
-import pickle
-import os
 
-COOKIE_FILE = "linkedin_cookies.pkl" # Use get_cookies to retrieve pickle file the first time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+
+COOKIE_FILE = (
+    "linkedin_cookies.pkl"  # Use get_cookies to retrieve pickle file the first time
+)
+
 
 def load_cookies(driver, cookie_file):
     """
@@ -17,17 +21,19 @@ def load_cookies(driver, cookie_file):
     Args:
         driver: Selenium driver that was initialised
         cookie_file: OS path to cookie pickle file
-    
+
     Description: Retrieves cookies and loads them in the driver
     """
     if not os.path.exists(cookie_file):
-        raise FileNotFoundError(f"Cookie file '{cookie_file}' not found. Please login manually and save cookies first by running get_cookies.py")
-    
+        raise FileNotFoundError(
+            f"Cookie file '{cookie_file}' not found. Please login manually and save cookies first by running get_cookies.py"
+        )
+
     with open(cookie_file, "rb") as f:
         cookies = pickle.load(f)
     for cookie in cookies:
         # Remove 'sameSite' if present — sometimes causes issues
-        cookie.pop('sameSite', None)
+        cookie.pop("sameSite", None)
         driver.add_cookie(cookie)
 
 
@@ -37,7 +43,7 @@ def initialise_driver(cookie_file):
 
     Args:
         cookie_file: OS path to cookie pickle file
-    
+
     Description: Initialises the driver, launches LinkedIn and loads the cookies
     """
     chrome_options = Options()
@@ -46,26 +52,35 @@ def initialise_driver(cookie_file):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--disable-font-subpixel-positioning")
     chrome_options.add_argument("--disable-lcd-text")
-    if os.environ.get('SESSIONNAME') != 'Console':
+    if os.environ.get("SESSIONNAME") != "Console":
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--window-size=1920,1080")
     else:
         chrome_options.add_argument("--start-maximized")
 
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()), options=chrome_options
+    )
 
     # Suppress console noise
     chrome_options.add_argument("--log-level=3")  # ERROR level only
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])  # Hide DevTools logs
-    chrome_options.add_experimental_option("prefs", {
-        "profile.default_content_setting_values.notifications": 2,  # Disable browser notifications
-        "profile.default_content_setting_values.media_stream_mic": 2,
-        "profile.default_content_setting_values.media_stream_camera": 2,
-        "profile.default_content_setting_values.geolocation": 2,
-    })
+    chrome_options.add_experimental_option(
+        "excludeSwitches", ["enable-logging"]
+    )  # Hide DevTools logs
+    chrome_options.add_experimental_option(
+        "prefs",
+        {
+            "profile.default_content_setting_values.notifications": 2,  # Disable browser notifications
+            "profile.default_content_setting_values.media_stream_mic": 2,
+            "profile.default_content_setting_values.media_stream_camera": 2,
+            "profile.default_content_setting_values.geolocation": 2,
+        },
+    )
 
-    driver.get("https://www.linkedin.com") # Open normal linkedin first to confirm/set cookies
+    driver.get(
+        "https://www.linkedin.com"
+    )  # Open normal linkedin first to confirm/set cookies
     time.sleep(3)
 
     load_cookies(driver, cookie_file)
@@ -80,21 +95,25 @@ def scraper(driver):
 
     Args:
         driver: Selenium driver that was initialised
-    
+
     Description: Scrapes the metadata of the queens board for use
 
     Returns: dict: {'board_size': int, 'board': List[List[int]]}
     """
 
-    driver.get("https://www.linkedin.com/games/queens") 
+    driver.get("https://www.linkedin.com/games/queens")
     driver.execute_script("document.body.style.zoom='100%'")
     time.sleep(1)
 
     board = driver.find_element(By.ID, "queens-grid")
 
     style = board.get_attribute("style")
-    rows = int(re.search(r"--rows:\s*(\d+)", style).group(1))
-    cols = int(re.search(r"--cols:\s*(\d+)", style).group(1))
+    row_match = re.search(r"--rows:\s*(\d+)", style)
+    col_match = re.search(r"--cols:\s*(\d+)", style)
+    if not row_match or not col_match:
+        raise ValueError(f"Invalid style string: {style}")
+    rows = int(row_match.group(1))
+    cols = int(col_match.group(1))
     assert rows == cols, "Grid should be square"
 
     size = rows
@@ -107,7 +126,7 @@ def scraper(driver):
     for cell in cells:
         class_attr = cell.get_attribute("class")
         aria = cell.get_attribute("aria-label")
-        
+
         color_match = re.search(r"cell-color-(\d+)", class_attr)
         color_index = int(color_match.group(1)) if color_match else None
 
@@ -151,7 +170,4 @@ def scraper(driver):
     # We now quit in the inputter
     # driver.quit()
 
-    return {
-        "board_size": size,
-        "board": colour_region_matrix
-    }
+    return {"board_size": size, "board": colour_region_matrix}

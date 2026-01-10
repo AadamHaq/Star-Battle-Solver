@@ -1,0 +1,38 @@
+# .pre-commit-config.yaml
+repos:
+  # Ruff: linter, imports, formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.0
+    hooks:
+      # Run the linter and auto-fix simple issues
+      - id: ruff-check
+        name: '🐍: ruff-check'
+        types_or: [python, pyi]
+        args: [--fix]
+
+      # Check and fix imports (isort)
+      - id: ruff
+        name: '🐍: ruff-isort'
+        args: [check, --select, I, --fix]
+
+      # Run formatter fixes (trailing whitespace, etc)
+      - id: ruff-format
+        name: '🐍: ruff-format'
+        types_or: [python, pyi]
+
+  # Trailing whitespace remover
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: main
+    hooks:
+      - id: trailing-whitespace
+
+  # Type checker: ty via uvx
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty type checker
+        entry: uvx ty check
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
