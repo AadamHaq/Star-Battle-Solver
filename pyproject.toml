@@ -1,5 +1,5 @@
 [project]
-name = "star-battle-solver"
+name = "linkedin-queens-solver"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

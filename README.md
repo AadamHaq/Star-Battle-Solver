@@ -1,8 +1,8 @@
-# Star-Battle-Solver
+# LinkedIn Queens Solver
 
 The aim of the project is to create an autosolver for the starbattle game. This will be done in two stages:
 
-- LinkedIn Queens Solver
+- LinkedIn Queens Solver (1 star - Star Battle)
 - Star Battle solver (2 and 3 stars)
 
 Star Battle is a generalisation of the LinkedIn Queens game. An example can be found [here](https://www.puzzle-star-battle.com/)
@@ -42,9 +42,11 @@ Key learnings:
 
 Next Steps:
 
-- Complete Linear Programming Solution
-- Create Computer Vision Scraper (never used before)
+- ~~Complete Linear Programming Solution~~
+- ~~Create Computer Vision Scraper (never used before)~~
 - Create RL solution after training data obtained
-- Add a way to share my time onto a group chat with my friends
-- Scrape their times daily and add them to a csv rather than doing this manually
-- Plotter to create a graph of everyone's times per day
+- ~~Add a way to share my time onto a group chat with my friends~~
+- ~~Scrape their times daily and add them to a csv rather than doing this manually~~
+- ~~Plotter to create a graph of everyone's times per day~~
+- ~~Implement CI/CD Pipelines and pre-commit~~
+- ~~Convert project to uv~~
