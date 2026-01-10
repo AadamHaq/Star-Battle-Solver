@@ -22,15 +22,16 @@ repos:
 
   # Trailing whitespace remover
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: main
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        name: '🧹💨 trailing-whitespace'
 
   # Type checker: ty via uvx
   - repo: local
     hooks:
       - id: ty
-        name: ty type checker
+        name: '🔍: ty type checker'
         entry: uvx ty check
         language: system
         types: [python]
