@@ -141,9 +141,7 @@ def get_fun_fact(df):
 
 
 # Path to the plot image
-image_path = (
-    r"C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver\queens_scores_plot.png"
-)
+image_path = r"C:\Users\user\OneDrive\Documents\GitHub\LinkedIn-Queens-Solver\queens_scores_plot.png"
 
 
 def upload_plot(driver):
