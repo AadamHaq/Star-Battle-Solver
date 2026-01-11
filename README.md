@@ -21,7 +21,7 @@ Additionally, I will scrape the current day's puzzle and solve it, before then s
 
 ### How to run
 
-- For first time use run `Queens\Logic\get_cookies.py` to got the cookies
+- For first time use run `Queens\Logic\get_cookies.py` to got the cookies by logging in to LinkedIn
 - Run `Queens\queens_solver.ipynb` to create a solution
   - Input what method you would like to solve: Backtracking, Linear Programming, Reinforcement Learning
   - Individual Files ran in order are:
